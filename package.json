@@ -1,0 +1,9 @@
+{
+  "name": "tesm",
+  "version": "1.0.0",
+  "description": "The Elm State Machine",
+  "main": "dist/index.js",
+  "repository": "git@github.com:zlumer/tesm.git",
+  "author": "zlumer <zlumer@gmail.com>",
+  "license": "MIT"
+}
