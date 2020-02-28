@@ -4,7 +4,7 @@ export const keys = <T>(obj: T): { [k in keyof T]: k } => Object.keys(obj).reduc
 
 const withState = <T extends string, TArgs extends any[], U extends {}>(state: T, f: (...args: TArgs) => U): (...args: TArgs) => U & { state: T } =>
 {
-	return (...args) => Object.assign(f(...args), { state })
+	return (...args) => Object.assign({ state }, f(...args))
 }
 type StateMap<T extends any> = { [key in keyof T]: (...args: Parameters<T[key]>) => (ReturnType<T[key]> & { state: key }) }
 const mapWithState = <K extends string, T extends { [key in K]: (...args: any[]) => any }>(obj: T) =>
