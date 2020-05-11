@@ -133,3 +133,23 @@ export const createHook = <
 		}
 	}
 }
+
+type FuncMap<T extends string> = {
+	[key in T]: (...args: any[]) => unknown
+}
+
+export const createSubMsg = <SubMsgMap extends FuncMap<string>>(subMsgs: SubMsgMap) =>
+<
+	SubMsg extends { type: string },
+	RootMsg extends { type: string }
+>(wrap: (msg: SubMsg) => RootMsg) => (() =>
+{
+	let o2 = {} as any
+	for (let s in subMsgs)
+	{
+		let t = s as SubMsg["type"]
+		let m = subMsgs[t] as any
+		o2[s] = (...args: any[]) => wrap(m(...args as any))
+	}
+	return o2 as {[key in SubMsg["type"]]: (...args: Parameters<SubMsgMap[key]>) => RootMsg}
+})()
