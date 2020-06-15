@@ -91,7 +91,7 @@ export function subupdate<Msg, Cmd, Model, TM, TC, TMD>(
 	}
 }
 
-export function splitApply<T, U, A, B>(arr: [T, ...U[]], head: (t: T) => A, tail: (u: U) => B): [A, ...B[]]
+export function splitApply<T, U, A, B>(arr: readonly [T, ...U[]], head: (t: T) => A, tail: (u: U) => B): [A, ...B[]]
 {
 	let [t, ...us] = arr
 	return [
