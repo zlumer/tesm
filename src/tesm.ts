@@ -155,3 +155,18 @@ export const createSubMsg = <SubMsgMap extends FuncMap<string>>(subMsgs: SubMsgM
 	}
 	return o2 as {[key in SubMsg["type"]]: (...args: Parameters<SubMsgMap[key]>) => RootMsg}
 })()
+
+export const createMsgCreator = <MsgMap extends FuncMap<string>>(subMsgs: MsgMap) =>
+<
+	Msg extends { type: string } & ReturnType<MsgMap[keyof MsgMap]>
+>(send: (msg: Msg) => void) => (() =>
+{
+	let o2 = {} as any
+	for (let s in subMsgs)
+	{
+		let t = s as Msg["type"]
+		let m = subMsgs[t] as any
+		o2[s] = (...args: any[]) => send(m(...args as any))
+	}
+	return o2 as {[key in Msg["type"]]: (...args: Parameters<MsgMap[key]>) => void}
+})()
