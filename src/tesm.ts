@@ -50,13 +50,13 @@ export const createHookRaw = <
 	Msg extends { type: string },
 	Cmd extends { type: string }
 >(
-	update: (msg: Msg, model: Model) => [Model, ...Cmd[]]
+	update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]]
 ) =>
 	(initialState: () => Model, keepHistory = -1) =>
 {
 	let state = initialState()
 	let history: [Model, Msg, Model, ...Cmd[]][] = []
-	function sendMsg(msg: Msg): /* [Msg, Model, Model, ... */Cmd[]/* ] */
+	function sendMsg(msg: Msg): /* [Msg, Model, Model, ... */readonly Cmd[]/* ] */
 	{
 		try
 		{
@@ -91,7 +91,7 @@ export const createHook = <
 	Msg extends { type: string },
 	Cmd extends { type: string }
 >(
-	update: (msg: Msg, model: Model) => [Model, ...Cmd[]]
+	update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]]
 ) =>
 	(initialState: () => Model) =>
 {
