@@ -9,9 +9,9 @@ export function simpleFlowNoThrow<
 		[msg in TMsg["type"]]?: (
 			msg: Extract<TMsg, { type: msg }>,
 			model: Extract<TState, { state: state }>
-		) => [TState, ...TCmd[]]
+		) => readonly [TState, ...TCmd[]]
 	}}
-): (msg: TMsg, model: TState) => [TState, ...TCmd[]] | undefined
+): (msg: TMsg, model: TState) => readonly [TState, ...TCmd[]] | undefined
 {
 	return (msg: TMsg, model: TState) =>
 	{
@@ -28,9 +28,9 @@ export function simpleFlowNoThrow<
 }
 
 export function throwInvalidInFlow<TMsg, TModel, TCmd>(
-	upd: (msg: TMsg, model: TModel) => [TModel, ...TCmd[]] | undefined,
+	upd: (msg: TMsg, model: TModel) => readonly [TModel, ...TCmd[]] | undefined,
 	err: (msg: TMsg, model: TModel) => never
-): (msg: TMsg, model: TModel) => [TModel, ...TCmd[]]
+): (msg: TMsg, model: TModel) => readonly [TModel, ...TCmd[]]
 {
 	return (msg: TMsg, model: TModel) =>
 	{
@@ -52,9 +52,9 @@ export function simpleFlow<
 		[msg in TMsg["type"]]?: (
 			msg: Extract<TMsg, { type: msg }>,
 			model: Extract<TState, { state: state }>
-		) => [TState, ...TCmd[]]
+		) => readonly [TState, ...TCmd[]]
 	}}
-): (msg: TMsg, model: TState) => [TState, ...TCmd[]]
+): (msg: TMsg, model: TState) => readonly [TState, ...TCmd[]]
 {
 	return throwInvalidInFlow(simpleFlowNoThrow(obj), (msg, model) => invalid_state(machine, msg, model))
 }
@@ -67,8 +67,8 @@ export function mandatoryFlow<
 	[msg in TMsg["type"]]: (
 		msg: Extract<TMsg, { type: msg }>,
 		model: Extract<TState, { state: state }>
-	) => [TState, ...TCmd[]]
-}}): (msg: TMsg, model: TState) => [TState, ...TCmd[]]
+	) => readonly [TState, ...TCmd[]]
+}}): (msg: TMsg, model: TState) => readonly [TState, ...TCmd[]]
 {
 	return simpleFlowNoThrow(obj) as any
 }
@@ -78,8 +78,8 @@ export function subupdate<Msg, Cmd, Model, TM, TC, TMD>(
 	wrapCmd: (c: TC) => Cmd,
 	extractSubmodel: (m: Model) => TMD,
 	wrapSubmodule: (m: Model, t: TMD) => Model,
-	update: (m1: TM, m2: TMD) => [TMD, ...TC[]]
-): (msg: Msg, model: Model) => [Model, ...Cmd[]]
+	update: (m1: TM, m2: TMD) => readonly [TMD, ...TC[]]
+): (msg: Msg, model: Model) => readonly [Model, ...Cmd[]]
 {
 	return (msg: Msg, model: Model) =>
 	{
