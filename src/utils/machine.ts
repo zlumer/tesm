@@ -62,11 +62,13 @@ export type XCmd<Machine extends RawMachine> = ExtractValues<Machine["cmds"]>
 
 export const skipMsg = <T, U>(f: (m: T) => U) => (_: any, m: T) => [f(m)] as const
 
-export const machine = <PModel extends Parameters<typeof state>[0],
-	PMsg extends Parameters<typeof msg>[0],
-	PCmd extends Parameters<typeof cmd>[0],
-	PSubNames extends string,
-	PSubs extends { [key in PSubNames]: RawMachine },
+export type _PModelBase = Parameters<typeof state>[0]
+export type _PMsgBase = Parameters<typeof msg>[0]
+export type _PCmdBase = Parameters<typeof cmd>[0]
+
+export const machine = <PModel extends _PModelBase,
+	PMsg extends _PMsgBase,
+	PCmd extends _PCmdBase,
 	>(
 		states: PModel, msgs: PMsg, cmds: PCmd
 	) =>
@@ -157,12 +159,14 @@ export const mixin = <TModel extends { state: string }, TMsg extends { type: str
 	return copy
 }
 
+export type _MachineBase = ReturnType<typeof machine>
+
 export const enhance = <
-	Machine extends ReturnType<typeof machine>,
-	InitArgs extends readonly any[]>(
+	Machine extends _MachineBase,
+>(
 		m: Machine,
 		name: string = "",
-		initial: (...args: InitArgs) => readonly [XModel<Machine>, ...XCmd<Machine>[]],
+		initial: () => readonly [XModel<Machine>, ...XCmd<Machine>[]],
 		flow: FlowDescriber<XModel<Machine>, XMsg<Machine>, XCmd<Machine>>,
 		extras: FlowDescriberExtra<XModel<Machine>, XMsg<Machine>, XCmd<Machine>> = {},
 ) =>
