@@ -24,6 +24,7 @@ export function simpleFlowNoThrow<
 				return upd(msg as any, model as any)
 			}
 		}
+		return undefined
 	}
 }
 
