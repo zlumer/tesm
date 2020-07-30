@@ -9,7 +9,7 @@ const withState = <T extends string, TArgs extends any[], U extends {}>(state: T
 	// duplicate `{ state }` to make sure we print it first in debug console. not effective
 	return (...args) => Object.assign({ state }, f(...args), { state })
 }
-type StateMap<T extends any> = { [key in keyof T]: (...args: Parameters<FunctionMap<T>[key]>) => (ReturnType<FunctionMap<T>[key]> & { state: key }) }
+export type StateMap<T extends any> = { [key in keyof T]: (...args: Parameters<FunctionMap<T>[key]>) => (ReturnType<FunctionMap<T>[key]> & { state: key }) }
 const mapWithState = <K extends string, T extends { [key in K]: (...args: any[]) => any }>(obj: T) =>
 {
 	let o2 = {} as any
@@ -24,7 +24,7 @@ const withType = <T extends string, TArgs extends any[], U extends {}>(type: T, 
 {
 	return (...args) => Object.assign(f(...args), { type })
 }
-type TypedMap<T extends any> = { [key in keyof T]: (...args: Parameters<FunctionMap<T>[key]>) => (ReturnType<FunctionMap<T>[key]> & { type: key }) }
+export type TypedMap<T extends any> = { [key in keyof T]: (...args: Parameters<FunctionMap<T>[key]>) => (ReturnType<FunctionMap<T>[key]> & { type: key }) }
 const mapWithType = <K extends string, T extends { [key in K]: (...args: any[]) => any }>(obj: T) =>
 {
 	let o2 = {} as any

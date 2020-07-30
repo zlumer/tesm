@@ -1,6 +1,6 @@
 {
   "name": "tesm",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "The Elm State Machine",
   "repository": "git@github.com:zlumer/tesm.git",
   "author": "zlumer <zlumer@gmail.com>",
@@ -11,7 +11,7 @@
     "dist"
   ],
   "scripts": {
-    "prepublish": "tsc"
+    "prepublish": "tsc && cp -r src dist/src"
   },
   "devDependencies": {
     "@types/react": "^16.9.43",

@@ -44,9 +44,9 @@ export const sublensField = <Model>() =>
 	<Field extends keyof Model>(field: Field) =>
 		sublens<Model, Model[Field]>(t => t[field], (t, u) => ({ ...t, [field]: u }))
 
-const _machine = <PModel extends Parameters<typeof state>[0]>(states: PModel) =>
-	<PMsg extends Parameters<typeof msg>[0]>(msgs: PMsg) =>
-		<PCmd extends Parameters<typeof cmd>[0]>(cmds: PCmd) =>
+const _machine = <PModel extends _PModelBase>(states: PModel) =>
+	<PMsg extends _PMsgBase>(msgs: PMsg) =>
+		<PCmd extends _PCmdBase>(cmds: PCmd) =>
 		{
 			return {
 				states: state(states),
