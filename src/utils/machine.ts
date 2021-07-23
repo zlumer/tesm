@@ -151,8 +151,8 @@ export const mixin = <TModel extends { state: string }, TMsg extends { type: str
 		{
 			let handler = extras[m as TMsg["type"]]
 
-			if (flows && !flows[m as TMsg["type"]])
-				flows[m as TMsg["type"]] = handler
+			if (flows && !(flows as any)[m as TMsg["type"]])
+				(flows as any)[m as TMsg["type"]] = handler
 		}
 		copy[s] = flows
 	}
