@@ -1,6 +1,7 @@
 import { SpecificMsg, SpecificState } from "./misc"
 import { splitApply, simpleFlow } from "../extensions"
 import { createMsgCreator, ExtractValues, cmd, msg, state } from "../tesm"
+import { FlowDescriber } from "../types"
 
 export const lensSetter = <T, U, V extends T = T>(set: (t: T, u: U) => V) =>
 	<SubCmd, Cmd>(convert: (c: SubCmd) => Cmd) =>
@@ -117,15 +118,6 @@ export const machine = <PModel extends _PModelBase,
 }
 
 
-type FlowDescriber<TState extends { state: string }, TMsg extends { type: string }, TCmd> = {
-	[state in TState["state"]]?: {
-		[msg in TMsg["type"]]?: (msg: Extract<TMsg, {
-			type: msg;
-		}>, model: Extract<TState, {
-			state: state;
-		}>) => readonly [TState, ...TCmd[]];
-	};
-}
 
 type FlowDescriberExtra<TModel extends { state: string }, TMsg extends { type: string }, TCmd> = {
 	[msg in TMsg["type"]]?: (msg: Extract<TMsg, {
