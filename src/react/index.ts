@@ -1,68 +1,51 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react'
 
 export function useTesmSync<Model, Msg, Cmd>(
-	update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]],
-	initial: () => readonly [Model, ...Cmd[]],
-	effectHandler: (cmd: Cmd, send: (msg: Msg) => void) => void,
-): [Model, (msg: Msg) => void, () => void]
-{
-	const [[model, ...cmds], setState] = useState(() => initial())
-	const send = (msg: Msg) => setState(s =>
-	{
-		const [model, ...oldCmds] = s
-		
-		const [mm, ...cmds] = update(msg, model)
-		for (let cmd of oldCmds.concat(cmds))
-			effectHandler(cmd, send)
-		
-		return [mm]
-	})
+    update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]],
+    initial: () => readonly [Model, ...Cmd[]],
+    effectHandler: (cmd: Cmd, send: (msg: Msg) => void) => void
+): [Model, (msg: Msg) => void, () => void] {
+    const [state, setState] = useState(() => initial())
+    const send = (msg: Msg) => setState((s) => update(msg, s[0]))
+    const reset = () => setState(() => initial())
 
-	let cancelled = false
-	const reset = () => setState(() => initial())
+    useEffect(() => {
+        const [model, ...cmds] = state
+        if (cmds.length) {
+            /*
+              важно, чтобы этот setState был над циклом, 
+              потому что в effectHandler может синхронно стригериться send 
+              и тогда этот setState и setState в send объединятся в батч 
+              и в итоге модель возьмется из последнего setState
+            */
+            setState([model]) 
+            for (let cmd of cmds) effectHandler(cmd, send)
+        }
+    }, [state])
 
-	let cancel = () => { cancelled = true }
-
-	// console.log(`[USE-TESM]: before effect ${cmds.length}`)
-	useEffect(() =>
-	{
-		// console.log(`[USE-TESM]: effect ${cancelled} ${cmds.length}`)
-		if (cancelled)
-			return cancel
-		
-		if (!cmds.length)
-			return cancel
-		
-		setState([model])
-
-		for (let cmd of cmds)
-		{
-			// console.log(`[USE-TESM]: cmd ${cancelled}`, cmd)
-			effectHandler(cmd, send)
-		}
-
-		return cancel
-	}, [cmds.length, cancelled])
-
-	return [model, send, reset]
+    return [state[0], send, reset]
 }
-export function useTesmEasy<Model, Msg, Cmd, MsgCreator>(machine: {
-		update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]],
-		initial: () => readonly [Model, ...Cmd[]],
-		msgCreator: (send: (msg: Msg) => void) => MsgCreator,
-	},
-	effectHandler: (cmd: Cmd, send: (msg: Msg) => void) => void
-)
-{
-	return useTesmWithCreator(machine.update, machine.initial, effectHandler, machine.msgCreator)
+export function useTesmEasy<Model, Msg, Cmd, MsgCreator>(
+    machine: {
+        update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]]
+        initial: () => readonly [Model, ...Cmd[]]
+        msgCreator: (send: (msg: Msg) => void) => MsgCreator
+    },
+    effectHandler: (cmd: Cmd, send: (msg: Msg) => void) => void
+) {
+    return useTesmWithCreator(
+        machine.update,
+        machine.initial,
+        effectHandler,
+        machine.msgCreator
+    )
 }
 export function useTesmWithCreator<Model, Msg, Cmd, MsgCreator>(
-	update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]],
-	initial: () => readonly [Model, ...Cmd[]],
-	effectHandler: (cmd: Cmd, send: (msg: Msg) => void) => void,
-	msgCreator: (send: (msg: Msg) => void) => MsgCreator
-): [Model, MsgCreator, () => void]
-{
-	const [model, send, reset] = useTesmSync(update, initial, effectHandler)
-	return [model, msgCreator(send), reset]
+    update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]],
+    initial: () => readonly [Model, ...Cmd[]],
+    effectHandler: (cmd: Cmd, send: (msg: Msg) => void) => void,
+    msgCreator: (send: (msg: Msg) => void) => MsgCreator
+): [Model, MsgCreator, () => void] {
+    const [model, send, reset] = useTesmSync(update, initial, effectHandler)
+    return [model, msgCreator(send), reset]
 }
