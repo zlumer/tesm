@@ -2,7 +2,7 @@ type FunctionMap<T extends any> = T extends {[key: string]: (...args: any[]) => 
 
 export type ExtractValues<T extends any> = ReturnType<FunctionMap<T>[keyof T]>
 
-export const keys = <T>(obj: T): { [k in keyof T]: k } => Object.keys(obj).reduce((acc, key) => ({...acc, [key]: key}), {} as {[k in keyof T]: k})
+export const keys = <T extends {}>(obj: T): { [k in keyof T]: k } => Object.keys(obj).reduce((acc, key) => ({...acc, [key]: key}), {} as {[k in keyof T]: k})
 
 const withState = <T extends string, TArgs extends any[], U extends {}>(state: T, f: (...args: TArgs) => U): (...args: TArgs) => U & { state: T } =>
 {
