@@ -1,3 +1,4 @@
+import { FlowDescriber } from './types';
 import { invalid_state } from "./tesm"
 
 export function simpleFlowNoThrow<
@@ -5,12 +6,7 @@ export function simpleFlowNoThrow<
 	TMsg extends {type: string},
 	TCmd
 >(
-	obj: { [state in TState["state"]]?: {
-		[msg in TMsg["type"]]?: (
-			msg: Extract<TMsg, { type: msg }>,
-			model: Extract<TState, { state: state }>
-		) => readonly [TState, ...TCmd[]]
-	}}
+	obj: FlowDescriber<TState, TMsg, TCmd>
 ): (msg: TMsg, model: TState) => readonly [TState, ...TCmd[]] | undefined
 {
 	return (msg: TMsg, model: TState) =>
@@ -49,12 +45,7 @@ export function simpleFlow<
 	TCmd
 >(
 	machine: string,
-	obj: { [state in TState["state"]]?: {
-		[msg in TMsg["type"]]?: (
-			msg: Extract<TMsg, { type: msg }>,
-			model: Extract<TState, { state: state }>
-		) => readonly [TState, ...TCmd[]]
-	}}
+	obj: FlowDescriber<TState, TMsg, TCmd>
 ): (msg: TMsg, model: TState) => readonly [TState, ...TCmd[]]
 {
 	return throwInvalidInFlow(simpleFlowNoThrow(obj), (msg, model) => invalid_state(machine, msg, model))
@@ -64,12 +55,7 @@ export function mandatoryFlow<
 	TState extends {state: string},
 	TMsg extends {type: string},
 	TCmd
->(obj: { [state in TState["state"]]: {
-	[msg in TMsg["type"]]: (
-		msg: Extract<TMsg, { type: msg }>,
-		model: Extract<TState, { state: state }>
-	) => readonly [TState, ...TCmd[]]
-}}): (msg: TMsg, model: TState) => readonly [TState, ...TCmd[]]
+>(obj: FlowDescriber<TState, TMsg, TCmd>): (msg: TMsg, model: TState) => readonly [TState, ...TCmd[]]
 {
 	return simpleFlowNoThrow(obj) as any
 }
