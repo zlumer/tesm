@@ -1,23 +1,38 @@
 {
   "name": "tesm",
-  "version": "1.5.5",
+  "version": "2.0.0",
   "description": "The Elm State Machine",
   "repository": "git@github.com:zlumer/tesm.git",
   "author": "zlumer <zlumer@gmail.com>",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./react": {
+      "import": "./dist/react/index.mjs",
+      "require": "./dist/react/index.cjs",
+      "types": "./dist/react/index.d.ts"
+    }
+  },
   "scripts": {
-    "prepublish": "rm -rf dist && tsc && cp -r src dist/ts"
+    "build": "npm run type-check && unbuild",
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/react": "^16.9.43",
-    "typescript": "^3.9.7"
+    "@types/react": "^19.0.10",
+    "unbuild": "^3.5.0",
+    "vitest": "^3.1.1"
   },
   "peerDependencies": {
-    "react": "^16.13.1"
+    "react": "^19.0.0"
+  },
+  "dependencies": {
+    "typescript": "^5.8.2"
   }
 }
