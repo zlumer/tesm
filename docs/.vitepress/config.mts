@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "TESM",
   description: "The Elm State Machine",
+  base: "/tesm/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
