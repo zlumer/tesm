@@ -78,7 +78,7 @@ to less boilerplate use an imported **`stateType()`** function
 ```ts
 const m = machine(
 	{
-		initial: stateType(),
+		initial: () => ({}),
 		loading: stateType<LoadingContext>(),
 		loaded: stateType<AppContext>(),
 	},
