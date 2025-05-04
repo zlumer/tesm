@@ -22,7 +22,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/zeeeeby/tesm' }
+      { icon: 'github', link: 'https://github.com/zlumer/tesm' }
     ]
   }
 })
