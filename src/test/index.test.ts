@@ -1,4 +1,4 @@
-import { enhance, machine, XCmd, XModel, XMsg } from "../machine"
+import { enhance, machine, XCmd, XModel, XMsg } from "../utils/machine"
 import { describe, it, expect } from 'vitest'
 
 type InitialContext = {}

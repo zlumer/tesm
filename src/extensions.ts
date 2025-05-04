@@ -3,7 +3,29 @@ type FlowDescriber<
 	TMsg extends { type: string },
 	TCmd
 > = {
-	[state in TState["state"]]?: {
+		[state in TState["state"]]?: {
+			[msg in TMsg["type"]]?: (
+				msg: Extract<
+					TMsg,
+					{
+						type: msg
+					}
+				>,
+				model: Extract<
+					TState,
+					{
+						state: state
+					}
+				>
+			) => readonly [TState, ...TCmd[]]
+		}
+	}
+
+type FlowDescriberExtra<
+	TModel extends { state: string },
+	TMsg extends { type: string },
+	TCmd
+> = {
 		[msg in TMsg["type"]]?: (
 			msg: Extract<
 				TMsg,
@@ -11,31 +33,9 @@ type FlowDescriber<
 					type: msg
 				}
 			>,
-			model: Extract<
-				TState,
-				{
-					state: state
-				}
-			>
-		) => readonly [TState, ...TCmd[]]
+			model: TModel
+		) => readonly [TModel, ...TCmd[]]
 	}
-}
-
-type FlowDescriberExtra<
-	TModel extends { state: string },
-	TMsg extends { type: string },
-	TCmd
-> = {
-	[msg in TMsg["type"]]?: (
-		msg: Extract<
-			TMsg,
-			{
-				type: msg
-			}
-		>,
-		model: TModel
-	) => readonly [TModel, ...TCmd[]]
-}
 
 export function throwInvalidInFlow<TMsg, TModel, TCmd>(
 	upd: (msg: TMsg, model: TModel) => readonly [TModel, ...TCmd[]] | undefined,
@@ -74,8 +74,7 @@ export const invalid_state = <T extends { state: string }, G extends { type: str
 	model: T
 ): never => {
 	throw new Error(
-		`[STATE MACHINE] unhandled state! ${machine}/${model.state}.${
-			msg.type
+		`[STATE MACHINE] unhandled state! ${machine}/${model.state}.${msg.type
 		}()\n${JSON.stringify(msg)}`
 	)
 }
@@ -91,4 +90,29 @@ export function simpleFlow<
 	return throwInvalidInFlow(simpleFlowNoThrow(obj), (msg, model) =>
 		invalid_state(machine, msg, model)
 	)
+}
+
+
+export function subupdate<Msg, Cmd, Model, TM, TC, TMD>(
+	extractMsg: (m: Msg) => TM,
+	wrapCmd: (c: TC) => Cmd,
+	extractSubmodel: (m: Model) => TMD,
+	wrapSubmodule: (m: Model, t: TMD) => Model,
+	update: (m1: TM, m2: TMD) => readonly [TMD, ...TC[]]
+): (msg: Msg, model: Model) => readonly [Model, ...Cmd[]] {
+	return (msg: Msg, model: Model) => {
+		let [submodel, ...cs] = update(extractMsg(msg), extractSubmodel(model))
+		return [
+			(submodel == extractSubmodel(model)) ? model : wrapSubmodule(model, submodel),
+			...cs.map(x => wrapCmd(x))
+		]
+	}
+}
+
+export function splitApply<T, U, A, B>(arr: readonly [T, ...U[]], head: (t: T) => A, tail: (u: U) => B): [A, ...B[]] {
+	let [t, ...us] = arr
+	return [
+		head(t),
+		...us.map(u => tail(u))
+	]
 }
