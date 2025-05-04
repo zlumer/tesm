@@ -34,10 +34,6 @@ export const cmd = mapWithType
 export const msg = mapWithType
 
 
-export const invalid_state = <T extends { state: string }, G extends { type: string }>(machine: string, msg: G, model: T): never => {
-	throw new Error(`[STATE MACHINE] unhandled state! ${machine}/${model.state}.${msg.type}()\n${JSON.stringify(msg)}`)
-}
-
 export const createHookRaw = <
 	Model extends { state: string },
 	Msg extends { type: string },

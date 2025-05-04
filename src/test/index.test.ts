@@ -1,5 +1,7 @@
 import { enhance, machine, XCmd, XModel, XMsg } from "../utils/machine"
 import { describe, it, expect } from 'vitest'
+import { stateType } from "../utils/misc";
+import { state } from "../tesm";
 
 type InitialContext = {}
 type CheckingForExistingRefreshTokenContext = { tgid: number; did: string }
@@ -27,23 +29,19 @@ type AuthExpiredNoNetworkContext = CheckingForExistingRefreshTokenContext & {
 	exponentialRetries: number
 }
 
-export const id =
-	<T extends {}>() =>
-		(m: T) =>
-			m
 
 const m = machine(
 	{
-		initial: id<InitialContext>(),
-		checking_for_existing_refresh_token: id<CheckingForExistingRefreshTokenContext>(),
-		waiting_for_otp: id<WaitingForOtpContext>(),
-		polling_refresh: id<PollingRefreshContext>(),
-		waiting_for_jwt: id<WaitingForJWTContext>(),
-		authed: id<AuthedContext>(),
-		otp_request_failed: id<OtpRequestFailedContext>(),
-		refresh_token_request_failed: id<RefreshTokenRequrestFailedContext>(),
-		jwt_request_failed: id<JwtRequesFailedContext>(),
-		auth_expired_no_network: id<AuthExpiredNoNetworkContext>(),
+		initial: stateType<InitialContext>(),
+		checking_for_existing_refresh_token: stateType<CheckingForExistingRefreshTokenContext>(),
+		waiting_for_otp: stateType<WaitingForOtpContext>(),
+		polling_refresh: stateType<PollingRefreshContext>(),
+		waiting_for_jwt: stateType<WaitingForJWTContext>(),
+		authed: stateType<AuthedContext>(),
+		otp_request_failed: stateType<OtpRequestFailedContext>(),
+		refresh_token_request_failed: stateType<RefreshTokenRequrestFailedContext>(),
+		jwt_request_failed: stateType<JwtRequesFailedContext>(),
+		auth_expired_no_network: stateType<AuthExpiredNoNetworkContext>(),
 	},
 	{
 		"ui.auth_requested": (tgid: number, did: string) => ({ tgid, did }),

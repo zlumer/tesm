@@ -50,6 +50,15 @@ const states = state({
     loading: <T extends LoadingContext>(m: T) => m,
     loaded: <T extends AppContext>(m: T) => m,
 })
+
+// or with `stateType` helper
+import { stateType } from "tesm"
+
+const states = state({
+	initial: stateType
+	loading: stateType<LoadingContext>(),
+	loaded: stateType<AppContext>(),
+})
 ```
 We pass an object to **`state()`** where the field names are state names and values are functions that serve as a strictly typed boilerplate.
 
