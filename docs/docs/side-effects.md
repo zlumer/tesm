@@ -41,7 +41,10 @@ function App() {
 			>
 				start load
 			</button>
-			<button onClick={() => msgs.finished_loading({ now: Date.now() })}>
+			<button
+				disabled={model.state !== "loading"}
+				onClick={() => msgs.finished_loading({ now: Date.now() })}
+			>
 				finish load
 			</button>
 		</div>
@@ -61,13 +64,13 @@ TESM comes with a couple of implementations of hooks, we will use the simplest o
 ```typescript
 import { createHook } from "tesm"
 // destructured from `LoadingState`
-import { msgs, state, update } from "./state"
+import { msgs, state, update, initial } from "./state"
 ```
 
 2. Create an instance of hook by providing it with an `update()` function of our state and with a function that returns initial state.
 
 ```typescript
-let hook = createHook(update)(states.initial({}))
+let hook = createHook(update)(initial)
 ```
 
 3. Add a side effect handler to the current state.
@@ -103,9 +106,9 @@ Let's take a look at the full example:
 
 ```typescript
 import { createHook } from "tesm"
-import { msgs, state, update } from "./state"
+import { msgs, state, update, initial } from "./state"
 
-let hook = createHook(update)(states.initial({}))
+let hook = createHook(update)(initial)
 hook.addHandler((cmd) => {
 	switch (cmd.type) {
 		case "startLoadingAnimation":

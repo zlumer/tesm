@@ -1,40 +1,50 @@
 import { Dispatch, useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react"
 import { createHandler } from "../tesm"
 import { useEvent } from "react-use-event-hook"
+import { createHook } from "../hook"
 
 
 /**
  * React Hook that creates a TEA-like reducer from State, Msg, and Cmd
  */
-export function useTea<State, Msg, Cmd>(
-	init: () => readonly [State, ...Cmd[]],
-	update: (msg: Msg, state: State) => readonly [State, ...Cmd[]],
+export function useTea<
+	Model extends { state: string },
+	Msg extends { type: string },
+	Cmd extends { type: string }
+>(
+	init: () => readonly [Model, ...Cmd[]],
+	update: (msg: Msg, state: Model) => readonly [Model, ...Cmd[]],
 	handleCmd: (cmd: Cmd) => void
-): [State, (msg: Msg) => void] {
-	const store = useMemo(() => createTeaStore(init, handleCmd, update), [init, update, handleCmd])
+): [Model, (msg: Msg) => void] {
+	const hook = useMemo(() => createHook(update)(init), [init, update])
+
+	useEffect(() => {
+		hook.addHandler(handleCmd)
+	}, [handleCmd])
 
 	const state = useSyncExternalStore(
-		store.subscribe,
-		store.getState
+		hook.subscribe,
+		hook.getState
 	)
 
-	const dispatch = useCallback(store.dispatch, [store])
+	const dispatch = useCallback(hook.send, [hook])
+
 
 	return [state, dispatch]
 }
 
 export function useTeaSimple<
-	State,
+	Model extends { state: string },
 	Msg extends { type: string },
 	Cmd extends { type: string }
 >(
 	machine: {
-		initial: () => readonly [State, ...Cmd[]]
-		update: (msg: Msg, state: State) => readonly [State, ...Cmd[]]
+		initial: () => readonly [Model, ...Cmd[]]
+		update: (msg: Msg, state: Model) => readonly [Model, ...Cmd[]]
 	},
 	cmds: { [key in Cmd["type"]]: (cmd: Extract<Cmd, { type: key }>) => any }
 ): readonly [
-	State,
+	Model,
 	{
 		[key in Msg["type"]]: (
 			params: Omit<Extract<Msg, { type: key }>, "type">
@@ -70,39 +80,3 @@ export function createMsgs<Msg extends { type: string }>(
 	return proxy as any
 }
 
-const createTeaStore = <State, Cmd, Msg>(init: () => readonly [State, ...Cmd[]], handleCmd: (cmd: Cmd) => void, update: (msg: Msg, state: State) => readonly [State, ...Cmd[]],) => {
-	let [initState, ...initCmds] = init()
-
-	let currentState = initState
-	let listeners: (() => void)[] = []
-	let cmdQueue = [...initCmds]
-
-	const processCmdQueue = () => {
-		if (cmdQueue.length > 0) {
-			const [cmd] = cmdQueue
-			if (cmd) {
-				cmdQueue = cmdQueue.slice(1)
-				handleCmd(cmd)
-			}
-		}
-	}
-
-	return {
-		getState: () => currentState,
-		subscribe: (listener: () => void) => {
-			listeners.push(listener)
-			return () => {
-				listeners = listeners.filter(x => x !== listener)
-			}
-		},
-		dispatch: (msg: Msg) => {
-			const [newState, ...cmds] = update(msg, currentState)
-			currentState = newState
-			cmdQueue = [...cmdQueue, ...cmds]
-
-			listeners.forEach(x => x())
-
-			processCmdQueue()
-		}
-	}
-}
