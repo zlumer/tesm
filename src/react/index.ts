@@ -1,5 +1,7 @@
-import { Dispatch, useCallback, useEffect, useMemo, useReducer, useState } from "react"
+import { Dispatch, useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react"
 import { createHandler } from "../tesm"
+import { useEvent } from "react-use-event-hook"
+
 
 /**
  * React Hook that creates a TEA-like reducer from State, Msg, and Cmd
@@ -9,29 +11,14 @@ export function useTea<State, Msg, Cmd>(
 	update: (msg: Msg, state: State) => readonly [State, ...Cmd[]],
 	handleCmd: (cmd: Cmd) => void
 ): [State, (msg: Msg) => void] {
-	let [initState, ...initCmds] = init()
+	const store = useMemo(() => createTeaStore(init, handleCmd, update), [init, update, handleCmd])
 
-	const [cmdQueue, setCmdQueue] = useState<Cmd[]>(initCmds)
-	const reducer = useCallback(
-		(state: State, msg: Msg) => {
-			const [newState, ...cmds] = update(msg, state)
-			setCmdQueue((prev) => [...prev, ...cmds])
-			return newState
-		},
-		[update, setCmdQueue]
+	const state = useSyncExternalStore(
+		store.subscribe,
+		store.getState
 	)
 
-	const [state, dispatch] = useReducer(reducer, initState)
-
-	useEffect(() => {
-		if (cmdQueue.length > 0) {
-			const [cmd] = cmdQueue
-			if (cmd) {
-				setCmdQueue(cmdQueue.slice(1))
-				handleCmd(cmd)
-			}
-		}
-	}, [cmdQueue, handleCmd])
+	const dispatch = useCallback(store.dispatch, [store])
 
 	return [state, dispatch]
 }
@@ -54,7 +41,7 @@ export function useTeaSimple<
 		) => Extract<Msg, { type: key }>
 	}
 ] {
-	const handler = useMemo(() => createHandler(cmds), [cmds])
+	const handler = useEvent(createHandler(cmds))
 	const [state, dispatch] = useTea(machine.initial, machine.update, handler)
 	const msgs = useMemo(() => createMsgs(dispatch), [dispatch])
 	const res = useMemo(() => [state, msgs] as const, [state, msgs])
@@ -81,4 +68,41 @@ export function createMsgs<Msg extends { type: string }>(
 		}
 	)
 	return proxy as any
+}
+
+const createTeaStore = <State, Cmd, Msg>(init: () => readonly [State, ...Cmd[]], handleCmd: (cmd: Cmd) => void, update: (msg: Msg, state: State) => readonly [State, ...Cmd[]],) => {
+	let [initState, ...initCmds] = init()
+
+	let currentState = initState
+	let listeners: (() => void)[] = []
+	let cmdQueue = [...initCmds]
+
+	const processCmdQueue = () => {
+		if (cmdQueue.length > 0) {
+			const [cmd] = cmdQueue
+			if (cmd) {
+				cmdQueue = cmdQueue.slice(1)
+				handleCmd(cmd)
+			}
+		}
+	}
+
+	return {
+		getState: () => currentState,
+		subscribe: (listener: () => void) => {
+			listeners.push(listener)
+			return () => {
+				listeners = listeners.filter(x => x !== listener)
+			}
+		},
+		dispatch: (msg: Msg) => {
+			const [newState, ...cmds] = update(msg, currentState)
+			currentState = newState
+			cmdQueue = [...cmdQueue, ...cmds]
+
+			listeners.forEach(x => x())
+
+			processCmdQueue()
+		}
+	}
 }
