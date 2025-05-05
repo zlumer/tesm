@@ -35,7 +35,10 @@ function App() {
 
 	return (
 		<div>
-			<button onClick={() => msgs.started_loading({ now: Date.now() })}>
+			<button
+				disabled={model.state === "loading"}
+				onClick={() => msgs.started_loading({ now: Date.now() })}
+			>
 				start load
 			</button>
 			<button onClick={() => msgs.finished_loading({ now: Date.now() })}>
