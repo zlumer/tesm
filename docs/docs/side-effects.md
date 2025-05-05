@@ -130,7 +130,3 @@ hook.send(msgs.finished_loading(Date.now()))
 console.log(hook.getState())
 // { state: 'loaded', loadingStarted: 1582582297994, loadingFinished: 1582582297996 }
 ```
-
-## Vue
-
-TBD
