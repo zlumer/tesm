@@ -57,7 +57,7 @@ export default App
 ## Node.js
 
 For convenience we can use a **hook** (not to be confused with React Hooks): an object that maintains current state and updates it when new `Msg` arrive.  
-TESM comes with a couple of implementations of hooks, we will use the simplest one of them called `createHook()`.
+TESM comes with a hook called `createHook()`.
 
 1. Import `createHook()` and our state.
 
