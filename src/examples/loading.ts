@@ -9,7 +9,7 @@ type InitialContext = {}
 type LoadingContext = {
     loadingStarted: number
 }
-type AppContext = LoadingContext & {
+type LoadedContext = LoadingContext & {
     loadingFinished: number
 }
 // #endregion types
@@ -21,7 +21,7 @@ const m = machine(
     {
         initial: stateType<InitialContext>(),
         loading: stateType<LoadingContext>(),
-        loaded: stateType<AppContext>(),
+        loaded: stateType<LoadedContext>(),
     },
     // #endregion part1
     {

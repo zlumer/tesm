@@ -56,7 +56,7 @@ Now we can create state machine
 const m = machine({
 	initial: <T extends InitialContext>(m: T) => m,
 	loading: <T extends LoadingContext>(m: T) => m,
-	loaded: <T extends AppContext>(m: T) => m,
+	loaded: <T extends LoadedContext>(m: T) => m,
 })
 ```
 

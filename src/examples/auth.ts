@@ -1,32 +1,45 @@
 import { enhance, machine, XCmd, XModel, XMsg } from "../utils/machine"
 import { stateType } from "../utils/misc";
 
-type InitialContext = {}
-type CheckingForExistingRefreshTokenContext = { tgid: number; did: string }
-type WaitingForOtpContext = CheckingForExistingRefreshTokenContext & {}
-type PollingRefreshContext = WaitingForOtpContext & {
-    otp: string
-}
-type WaitingForJWTContext = CheckingForExistingRefreshTokenContext & {}
-type AuthedContext = CheckingForExistingRefreshTokenContext & {
-    jwtExpiry: number
-    jwtRetriesLeft: number,
-    jwt: string
-}
-type OtpRequestFailedContext = CheckingForExistingRefreshTokenContext & {
-    error: unknown
-}
-type RefreshTokenRequrestFailedContext = CheckingForExistingRefreshTokenContext & {
-    error: unknown,
-    otp: string
-}
-type JwtRequesFailedContext = CheckingForExistingRefreshTokenContext & {
-    error: unknown
-}
-type AuthExpiredNoNetworkContext = CheckingForExistingRefreshTokenContext & {
-    exponentialRetries: number
+type BaseContext = {
+    tgid: number;
+    did: string;
 }
 
+type InitialContext = {}
+
+type CheckingForExistingRefreshTokenContext = BaseContext
+
+type WaitingForOtpContext = BaseContext
+
+type PollingRefreshContext = BaseContext & {
+    otp: string;
+}
+
+type WaitingForJwtContext = BaseContext
+
+type AuthedContext = BaseContext & {
+    jwt: string;
+    jwtExpiry: number;
+    jwtRetriesLeft: number;
+}
+
+type OtpRequestFailedContext = BaseContext & {
+    error: unknown;
+}
+
+type RefreshTokenRequestFailedContext = BaseContext & {
+    otp: string;
+    error: unknown;
+}
+
+type JwtRequestFailedContext = BaseContext & {
+    error: unknown;
+}
+
+type AuthExpiredNoNetworkContext = BaseContext & {
+    exponentialRetries: number;
+}
 
 const m = machine(
     {
@@ -34,12 +47,12 @@ const m = machine(
         checking_for_existing_refresh_token: stateType<CheckingForExistingRefreshTokenContext>(),
         waiting_for_otp: stateType<WaitingForOtpContext>(),
         polling_refresh: stateType<PollingRefreshContext>(),
-        waiting_for_jwt: stateType<WaitingForJWTContext>(),
+        waiting_for_jwt: stateType<WaitingForJwtContext>(),
         authed: stateType<AuthedContext>(),
         otp_request_failed: stateType<OtpRequestFailedContext>(),
-        refresh_token_request_failed: stateType<RefreshTokenRequrestFailedContext>(),
-        jwt_request_failed: stateType<JwtRequesFailedContext>(),
-        auth_expired_no_network: stateType<AuthExpiredNoNetworkContext>(),
+        refresh_token_request_failed: stateType<RefreshTokenRequestFailedContext>(),
+        jwt_request_failed: stateType<JwtRequestFailedContext>(),
+        auth_expired_no_network: stateType<AuthExpiredNoNetworkContext>()
     },
     {
         "ui.auth_requested": (tgid: number, did: string) => ({ tgid, did }),
