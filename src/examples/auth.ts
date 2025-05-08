@@ -1,5 +1,5 @@
 import { enhance, machine, XCmd, XModel, XMsg } from "../utils/machine"
-import { stateType } from "../utils/misc";
+import { st } from "../utils/misc";
 
 type BaseContext = {
     tgid: number;
@@ -43,16 +43,16 @@ type AuthExpiredNoNetworkContext = BaseContext & {
 
 const m = machine(
     {
-        initial: stateType<InitialContext>(),
-        checking_for_existing_refresh_token: stateType<CheckingForExistingRefreshTokenContext>(),
-        waiting_for_otp: stateType<WaitingForOtpContext>(),
-        polling_refresh: stateType<PollingRefreshContext>(),
-        waiting_for_jwt: stateType<WaitingForJwtContext>(),
-        authed: stateType<AuthedContext>(),
-        otp_request_failed: stateType<OtpRequestFailedContext>(),
-        refresh_token_request_failed: stateType<RefreshTokenRequestFailedContext>(),
-        jwt_request_failed: stateType<JwtRequestFailedContext>(),
-        auth_expired_no_network: stateType<AuthExpiredNoNetworkContext>()
+        initial: st<InitialContext>(),
+        checking_for_existing_refresh_token: st<CheckingForExistingRefreshTokenContext>(),
+        waiting_for_otp: st<WaitingForOtpContext>(),
+        polling_refresh: st<PollingRefreshContext>(),
+        waiting_for_jwt: st<WaitingForJwtContext>(),
+        authed: st<AuthedContext>(),
+        otp_request_failed: st<OtpRequestFailedContext>(),
+        refresh_token_request_failed: st<RefreshTokenRequestFailedContext>(),
+        jwt_request_failed: st<JwtRequestFailedContext>(),
+        auth_expired_no_network: st<AuthExpiredNoNetworkContext>()
     },
     {
         "ui.auth_requested": (tgid: number, did: string) => ({ tgid, did }),

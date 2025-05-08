@@ -1,6 +1,6 @@
 // #region completeCode
 // #region import
-import { machine, stateType, XMsg, XModel, XCmd, enhance } from "tesm"
+import { machine, st, XMsg, XModel, XCmd, enhance } from "tesm"
 // #endregion import 
 
 // #region types
@@ -19,9 +19,9 @@ type LoadedContext = LoadingContext & {
 // #region part3
 const m = machine(
     {
-        initial: stateType<InitialContext>(),
-        loading: stateType<LoadingContext>(),
-        loaded: stateType<LoadedContext>(),
+        initial: st<InitialContext>(),
+        loading: st<LoadingContext>(),
+        loaded: st<LoadedContext>(),
     },
     // #endregion part1
     {

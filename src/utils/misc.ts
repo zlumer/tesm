@@ -31,7 +31,7 @@ export function assertSpecificState<TModel extends { state: string }, TKey exten
 		throw new Error(`${model} is ${model.state}, not ${key}!`)
 }
 
-export const stateType =
+export const st =
 	<T extends {}>() =>
 		(m: T) =>
 			m

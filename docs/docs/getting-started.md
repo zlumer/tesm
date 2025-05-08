@@ -60,7 +60,7 @@ const m = machine({
 })
 ```
 
-to less boilerplate use an imported **`stateType()`** function
+to less boilerplate use an imported **`st()`** function
 
 <<< @/../src/examples/loading.ts#part1
 
