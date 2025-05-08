@@ -43,26 +43,30 @@ export type Model = XModel<typeof m>
 // #endregion extractedTypes
 
 // #region enhanced
-export const LoadingState = enhance(m, "LoadingState", () => [m.states.initial({})], {
-    initial: {
-        // #region focus
-        started_loading: (msg, model) => [
-            m.states.loading({ loadingStarted: msg.now }),
-            m.cmds.startLoadingAnimation(),
-        ],
-        // #endregion focus
-    },
-    loading: {
-        finished_loading: (msg, model) => [
-            m.states.loaded({
-                loadingStarted: model.loadingStarted,
-                loadingFinished: msg.now,
-            }),
-            m.cmds.displayPopup(
-                `Loading finished in ${msg.now - model.loadingStarted} milliseconds!`
-            ),
-        ],
-    },
-})
+export const LoadingState = enhance(
+    m, // our machine 
+    "LoadingState", // machine name for debug
+    () => [m.states.initial({})], // initial state and commands
+    {
+        initial: {
+            // #region focus
+            started_loading: (msg, model) => [
+                m.states.loading({ loadingStarted: msg.now }),
+                m.cmds.startLoadingAnimation(),
+            ],
+            // #endregion focus
+        },
+        loading: {
+            finished_loading: (msg, model) => [
+                m.states.loaded({
+                    loadingStarted: model.loadingStarted,
+                    loadingFinished: msg.now,
+                }),
+                m.cmds.displayPopup(
+                    `Loading finished in ${msg.now - model.loadingStarted} milliseconds!`
+                ),
+            ],
+        },
+    })
 // #endregion enhanced
 // #endregion completeCode

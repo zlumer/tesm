@@ -95,7 +95,7 @@ The convention for `Msg` names is `snake_case` and past tense verbs. These are t
 
 ---
 
-6. Let's extract types from our objects for future use.
+6. Let's extract types from our machine for future use.
 
 <<< @/../src/examples/loading.ts#extractedTypes
 
