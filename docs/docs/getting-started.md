@@ -31,9 +31,7 @@ In this example we will develop a small state that handles a subset of the appli
 
 1. Import the required components:
 
-```ts
-import { machine, stateType, XMsg, XModel, XCmd, enhance } from "tesm"
-```
+<<< @/../src/examples/loading.ts#import
 
 ---
 
@@ -42,16 +40,9 @@ We will have **3 states**: `initial`, `loading` and `loaded`.
 
 Every **state** has a **context** where all the data is stored. Context is basically a plain JS object that stores fields with data.
 
-2. Let's create **2 context types** for when the loading process has just started and when the loading process has completed.
+2. Let's create **context types** for when the loading process has just started and when the loading process has completed.
 
-```ts
-type LoadingContext = {
-	loadingStarted: number
-}
-type AppContext = LoadingContext & {
-	loadingFinished: number
-}
-```
+<<< @/../src/examples/loading.ts#types
 
 `loadingStarted` is the time when loading has started. `loadingFinished` is the time when loading has finished.
 
@@ -62,30 +53,16 @@ Now we can create state machine
 3. Let's create our states.
 
 ```ts
-const m = machine(
-	{
-		initial: () => ({}),
-		loading: <T extends LoadingContext>(m: T) => m,
-		loaded: <T extends AppContext>(m: T) => m,
-	},
-	{},
-	{}
-)
+const m = machine({
+	initial: <T extends InitialContext>(m: T) => m,
+	loading: <T extends LoadingContext>(m: T) => m,
+	loaded: <T extends AppContext>(m: T) => m,
+})
 ```
 
 to less boilerplate use an imported **`stateType()`** function
 
-```ts
-const m = machine(
-	{
-		initial: () => ({}),
-		loading: stateType<LoadingContext>(),
-		loaded: stateType<AppContext>(),
-	},
-	{},
-	{}
-)
-```
+<<< @/../src/examples/loading.ts#part1
 
 We pass an object as `machine` first argument where the field names are state names and values are functions that serve as a strictly typed boilerplate.
 
@@ -100,18 +77,7 @@ You can think of `Msg` as events that happen in outside world and are passed to 
 
 4. Let's create a couple of `Msg`.
 
-```ts
-const m = machine(
-	{
-		// our states
-	},
-	{
-		started_loading: (now: number) => ({ now }),
-		finished_loading: (now: number) => ({ now }),
-	},
-	{}
-)
-```
+<<< @/../src/examples/loading.ts#part2
 
 msg structure is similar to state: we pass as `machine` second argument an object with `Msg` names and generator functions.
 
@@ -122,20 +88,7 @@ The convention for `Msg` names is `snake_case` and past tense verbs. These are t
 
 5. Let's create a couple of `Cmd`.
 
-```ts
-const m = machine(
-	{
-		// our states
-	},
-	{
-		// our msgs
-	},
-	{
-		startLoadingAnimation: () => ({}),
-		displayPopup: (text: string) => ({ text }),
-	}
-)
-```
+<<< @/../src/examples/loading.ts#part3
 
 `Cmd` are almost identical to `Msg`, the only difference being the naming convention: `Cmd` names are `camelCase` and use present tense verbs. You should name `Cmd` the same way you name methods in your code.  
 `loadUserInfo(uid: string)`, `todo.create(name: string)` and `cancelLoading` are all good names for `Cmd`.
@@ -144,11 +97,7 @@ const m = machine(
 
 6. Let's extract types from our objects for future use.
 
-```ts
-export type Msg = XMsg<typeof m>
-export type Cmd = XCmd<typeof m>
-export type Model = XModel<typeof m>
-```
+<<< @/../src/examples/loading.ts#extractedTypes
 
 ---
 
@@ -188,32 +137,7 @@ Let's create our state transition logic by passing the object to the **`enhance(
 
 Try use autocomplete between curly braces and it will suggest the initial state and messages to you.
 
-```ts
-export const LoadingState = enhance(
-	m, // our machine
-	"LoadingState", // machine name for debug
-	() => [m.states.initial({})], // initial state and cmds if you want
-	{
-		initial: {
-			started_loading: (msg, model) => [
-				m.states.loading({ loadingStarted: msg.now }),
-				m.cmds.startLoadingAnimation(),
-			],
-		},
-		loading: {
-			finished_loading: (msg, model) => [
-				m.states.loaded({
-					loadingStarted: model.loadingStarted,
-					loadingFinished: msg.now,
-				}),
-				m.cmds.displayPopup(
-					`Loading finished in ${msg.now - model.loadingStarted} milliseconds!`
-				),
-			],
-		},
-	}
-)
-```
+<<< @/../src/examples/loading.ts#enhanced
 
 We're using [pattern matching](https://stackoverflow.com/questions/2502354/what-is-pattern-matching-in-functional-languages) to process incoming messages based on their types and current state type.
 
@@ -223,12 +147,7 @@ The `enhance` function will throw an error if current state cannot handle the me
 
 Let's focus on the return value in this part of the code:
 
-```typescript
-[
-    m.states.loading({ loadingStarted: msg.now }),
-    m.cmds.startLoadingAnimation(),
-],
-```
+<<< @/../src/examples/loading.ts#focus
 
 First element of the array is the updated state. States should always be immutable and it's up to you to make sure that none of the fields of the states are ever changed. Use [spread syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) where applicable.  
 Based on the state definitions from step 3 of this tutorial. TypeScript checks that all of the required parameters were passed to the state context and ensures type safety
@@ -242,53 +161,4 @@ Let's take a look at the full code of the example before proceeding to the _oute
 
 ## Complete code of the example
 
-```ts
-import { machine, stateType, XMsg, XModel, XCmd, enhance } from "tesm"
-
-type LoadingContext = {
-	loadingStarted: number
-}
-type AppContext = LoadingContext & {
-	loadingFinished: number
-}
-
-const m = machine(
-	{
-		initial: () => ({}),
-		loading: stateType<LoadingContext>(),
-		loaded: stateType<AppContext>(),
-	},
-	{
-		started_loading: (now: number) => ({ now }),
-		finished_loading: (now: number) => ({ now }),
-	},
-	{
-		startLoadingAnimation: () => ({}),
-		displayPopup: (text: string) => ({ text }),
-	}
-)
-
-export type Msg = XMsg<typeof m>
-export type Cmd = XCmd<typeof m>
-export type Model = XModel<typeof m>
-
-export const LoadingState = enhance(m, "LoadingState", () => [m.states.initial({})], {
-	initial: {
-		started_loading: (msg, model) => [
-			m.states.loading({ loadingStarted: msg.now }),
-			m.cmds.startLoadingAnimation(),
-		],
-	},
-	loading: {
-		finished_loading: (msg, model) => [
-			m.states.loaded({
-				loadingStarted: model.loadingStarted,
-				loadingFinished: msg.now,
-			}),
-			m.cmds.displayPopup(
-				`Loading finished in ${msg.now - model.loadingStarted} milliseconds!`
-			),
-		],
-	},
-})
-```
+<<< @/../src/examples/loading.ts#completeCode
