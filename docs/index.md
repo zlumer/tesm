@@ -4,6 +4,7 @@ layout: home
 
 hero:
     name: "TESM"
+    image: example.svg
     text: "The Elm State Machine"
     tagline: Expressive, concise and robust state management for typescript ecosystem
     actions:
@@ -22,3 +23,9 @@ features:
       title: Elm Architecture
       details: Use concepts from The Elm Architecture (Model, Msg, Cmd). Manage application state in a totally pure way
 ---
+
+## Traffic Light State Machine Example
+
+[View full example](/docs/examples/traffic-light)
+
+<<< @/../src/examples/trafficLight.ts#example

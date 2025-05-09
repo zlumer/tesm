@@ -1,5 +1,5 @@
-import { enhance, machine, XCmd, XModel, XMsg } from "../utils/machine"
-import { st } from "../utils/misc";
+// #region example
+import { machine, st, XMsg, XModel, XCmd, enhance } from "tesm"
 
 type BaseContext = {
     tgid: number;
@@ -217,6 +217,7 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
         },
     },
 })
+// #endregion example
 
 
 export namespace Auth {
@@ -240,5 +241,5 @@ export namespace Auth {
         return cleanupLegacy(enhanced.update(msg, state))
     }
 
-    export const machine = enhance
+    export const machine = enhanced
 }

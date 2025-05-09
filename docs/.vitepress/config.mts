@@ -19,7 +19,14 @@ export default defineConfig({
           { text: 'Getting Started', link: '/docs/getting-started' },
           { text: 'Side effects', link: '/docs/side-effects' },
         ]
-      },]
+      }, {
+        text: "Examples",
+        items: [
+          { text: 'Traffic light', link: '/docs/examples/traffic-light' },
+          { text: 'Auth flow', link: '/docs/examples/auth-flow' },
+        ]
+      }],
+
     },
 
     socialLinks: [
