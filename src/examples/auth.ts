@@ -65,10 +65,10 @@ const m = machine(
         jwt_request_failed: (now: number, error: unknown) => ({ now, error }),
     },
     {
-        request_otp: (tgid: number) => ({ tgid }),
-        send_otp: (tgid: number, otp: string, did: string) => ({ tgid, otp, did }),
-        request_jwt: (tgid: number) => ({ tgid }),
-        refresh_jwt: (tgid: number, at: number) => ({ tgid, at }),
+        requestOtp: (tgid: number) => ({ tgid }),
+        sendOtp: (tgid: number, otp: string, did: string) => ({ tgid, otp, did }),
+        requestJwt: (tgid: number) => ({ tgid }),
+        refreshJwt: (tgid: number, at: number) => ({ tgid, at }),
         setExchangingCodeLoading: (value: boolean) => ({ value }),
     }
 )
@@ -81,18 +81,18 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
     initial: {
         "ui.auth_requested": (msg, state) => [
             m.states.checking_for_existing_refresh_token({ tgid: msg.tgid, did: msg.did }),
-            m.cmds.request_jwt(msg.tgid),
+            m.cmds.requestJwt(msg.tgid),
             m.cmds.setExchangingCodeLoading(true),
         ],
     },
     checking_for_existing_refresh_token: {
         "jwt_request_failed": (msg, state) => [
             m.states.waiting_for_otp({ did: state.did, tgid: state.tgid }),
-            m.cmds.request_otp(state.tgid),
+            m.cmds.requestOtp(state.tgid),
         ],
         "refresh_token_expired": (msg, state) => [
             m.states.waiting_for_otp({ did: state.did, tgid: state.tgid }),
-            m.cmds.request_otp(state.tgid),
+            m.cmds.requestOtp(state.tgid),
         ],
         "jwt_arrived": ({ jwt, expiry }, state) => [
             m.states.authed({
@@ -102,13 +102,13 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
                 jwtRetriesLeft: JWT_RETRIES
             }),
             m.cmds.setExchangingCodeLoading(false),
-            m.cmds.refresh_jwt(state.tgid, (expiry * 1000) - JWT_REFRESH_BEFORE_EXPIRY),
+            m.cmds.refreshJwt(state.tgid, (expiry * 1000) - JWT_REFRESH_BEFORE_EXPIRY),
         ],
     },
     waiting_for_otp: {
         "otp_arrived": (msg, state) => [
             m.states.polling_refresh({ tgid: state.tgid, did: state.did, otp: msg.otp }),
-            m.cmds.send_otp(state.tgid, msg.otp, state.did),
+            m.cmds.sendOtp(state.tgid, msg.otp, state.did),
         ],
         "otp_request_failed": (msg, state) => [
             m.states.otp_request_failed({ tgid: state.tgid, did: state.did, error: msg.error }),
@@ -118,14 +118,14 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
     otp_request_failed: {
         "ui.auth_requested": (msg, state) => [
             m.states.waiting_for_otp({ tgid: msg.tgid, did: state.did }),
-            m.cmds.request_otp(msg.tgid),
+            m.cmds.requestOtp(msg.tgid),
             m.cmds.setExchangingCodeLoading(true),
         ],
     },
     polling_refresh: {
         "refresh_token_arrived": (msg, state) => [
             m.states.waiting_for_jwt({ tgid: state.tgid, did: state.did }),
-            m.cmds.request_jwt(state.tgid),
+            m.cmds.requestJwt(state.tgid),
         ],
         "refresh_token_request_failed": (msg, state) => [
             m.states.refresh_token_request_failed({ tgid: state.tgid, did: state.did, otp: state.otp, error: msg.error }),
@@ -135,7 +135,7 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
     refresh_token_request_failed: {
         "ui.auth_requested": (msg, state) => [
             m.states.polling_refresh({ tgid: state.tgid, did: state.did, otp: state.otp }),
-            m.cmds.send_otp(state.tgid, state.otp, state.did),
+            m.cmds.sendOtp(state.tgid, state.otp, state.did),
             m.cmds.setExchangingCodeLoading(true),
         ],
     },
@@ -145,7 +145,7 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
                 tgid: state.tgid, did: state.did, jwt: msg.jwt, jwtExpiry: (msg.expiry * 1000), jwtRetriesLeft: JWT_RETRIES
             }),
             m.cmds.setExchangingCodeLoading(false),
-            m.cmds.refresh_jwt(state.tgid, (msg.expiry * 1000) - JWT_REFRESH_BEFORE_EXPIRY),
+            m.cmds.refreshJwt(state.tgid, (msg.expiry * 1000) - JWT_REFRESH_BEFORE_EXPIRY),
         ],
         "jwt_request_failed": (msg, state) => [
             m.states.jwt_request_failed({ tgid: state.tgid, did: state.did, error: msg.error }),
@@ -153,14 +153,14 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
         ],
         "refresh_token_expired": (msg, state) => [
             m.states.waiting_for_otp({ tgid: state.tgid, did: state.did }),
-            m.cmds.request_otp(state.tgid),
+            m.cmds.requestOtp(state.tgid),
             m.cmds.setExchangingCodeLoading(true),
         ],
     },
     jwt_request_failed: {
         "ui.auth_requested": (msg, state) => [
             m.states.waiting_for_jwt({ tgid: state.tgid, did: state.did }),
-            m.cmds.request_jwt(state.tgid),
+            m.cmds.requestJwt(state.tgid),
             m.cmds.setExchangingCodeLoading(true),
         ],
     },
@@ -169,7 +169,7 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
             m.states.authed({
                 ...state, jwt: msg.jwt, jwtExpiry: (msg.expiry * 1000)
             }),
-            m.cmds.refresh_jwt(state.tgid, msg.expiry * 1000 - JWT_REFRESH_BEFORE_EXPIRY),
+            m.cmds.refreshJwt(state.tgid, msg.expiry * 1000 - JWT_REFRESH_BEFORE_EXPIRY),
             m.cmds.setExchangingCodeLoading(false),
         ],
         "jwt_request_failed": (msg, state) => {
@@ -177,25 +177,25 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
 
             if (!isExpired) return [
                 m.states.authed({ ...state, jwtRetriesLeft: state.jwtRetriesLeft - 1 }),
-                m.cmds.refresh_jwt(state.tgid, msg.now + JWT_RETRY_DELAY),
+                m.cmds.refreshJwt(state.tgid, msg.now + JWT_RETRY_DELAY),
             ];
 
             if (state.jwtRetriesLeft <= 0) {
                 let exponentialBackoff = Math.pow(2, -state.jwtRetriesLeft) * JWT_RETRY_DELAY
                 return [
                     m.states.auth_expired_no_network({ tgid: state.tgid, did: state.did, exponentialRetries: 0 }),
-                    m.cmds.refresh_jwt(state.tgid, msg.now + exponentialBackoff),
+                    m.cmds.refreshJwt(state.tgid, msg.now + exponentialBackoff),
                 ];
             }
             return [
                 m.states.auth_expired_no_network({ tgid: state.tgid, did: state.did, exponentialRetries: 0 }),
-                m.cmds.refresh_jwt(state.tgid, msg.now + JWT_RETRY_DELAY),
+                m.cmds.refreshJwt(state.tgid, msg.now + JWT_RETRY_DELAY),
             ];
 
         },
         "refresh_token_expired": (msg, state) => [
             m.states.waiting_for_otp({ tgid: state.tgid, did: state.did }),
-            m.cmds.request_otp(state.tgid),
+            m.cmds.requestOtp(state.tgid),
             m.cmds.setExchangingCodeLoading(true),
         ],
     },
@@ -204,7 +204,7 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
             m.states.authed({
                 tgid: state.tgid, did: state.did, jwt: msg.jwt, jwtExpiry: (msg.expiry * 1000), jwtRetriesLeft: JWT_RETRIES
             }),
-            m.cmds.refresh_jwt(state.tgid, (msg.expiry * 1000) - JWT_REFRESH_BEFORE_EXPIRY),
+            m.cmds.refreshJwt(state.tgid, (msg.expiry * 1000) - JWT_REFRESH_BEFORE_EXPIRY),
         ],
         "jwt_request_failed": (msg, state) => {
             let exponentialBackoff = Math.pow(2, state.exponentialRetries) * JWT_RETRY_DELAY
@@ -212,7 +212,7 @@ const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
                 m.states.auth_expired_no_network({
                     tgid: state.tgid, did: state.did, exponentialRetries: state.exponentialRetries + 1
                 }),
-                m.cmds.refresh_jwt(state.tgid, msg.now + exponentialBackoff),
+                m.cmds.refreshJwt(state.tgid, msg.now + exponentialBackoff),
             ];
         },
     },
