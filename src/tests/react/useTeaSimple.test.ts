@@ -24,15 +24,6 @@ describe("StrictMode", () => {
     })
 })
 
-it('should initialize with initial state', () => {
-    const { result } = renderHook(() =>
-        useTeaSimple(LoadingState, { displayPopup: vi.fn(), startLoadingAnimation: vi.fn() })
-    )
-
-    expect(result.current[0]).toEqual({ state: 'initial' })
-    expect(result.current[1]).toBeDefined()
-})
-
 
 it("happy path", () => {
     const mockHandlers = {
@@ -43,6 +34,9 @@ it("happy path", () => {
     const { result } = renderHook(() =>
         useTeaSimple(LoadingState, mockHandlers)
     )
+
+    expect(result.current[0]).toEqual({ state: 'initial' })
+    expect(result.current[1]).toBeDefined()
 
     act(() => {
         result.current[1].started_loading({ now: 1000 })
