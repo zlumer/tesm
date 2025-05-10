@@ -100,7 +100,7 @@ export const machine = <
 
 export type _MachineBase = ReturnType<typeof machine>
 
-type FlowDescriber<
+export type FlowDescriber<
 	TState extends { state: string },
 	TMsg extends { type: string },
 	TCmd

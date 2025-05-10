@@ -1,41 +1,4 @@
-type FlowDescriber<
-	TState extends { state: string },
-	TMsg extends { type: string },
-	TCmd
-> = {
-		[state in TState["state"]]?: {
-			[msg in TMsg["type"]]?: (
-				msg: Extract<
-					TMsg,
-					{
-						type: msg
-					}
-				>,
-				model: Extract<
-					TState,
-					{
-						state: state
-					}
-				>
-			) => readonly [TState, ...TCmd[]]
-		}
-	}
-
-type FlowDescriberExtra<
-	TModel extends { state: string },
-	TMsg extends { type: string },
-	TCmd
-> = {
-		[msg in TMsg["type"]]?: (
-			msg: Extract<
-				TMsg,
-				{
-					type: msg
-				}
-			>,
-			model: TModel
-		) => readonly [TModel, ...TCmd[]]
-	}
+import { FlowDescriber } from "./utils/machine"
 
 export function throwInvalidInFlow<TMsg, TModel, TCmd>(
 	upd: (msg: TMsg, model: TModel) => readonly [TModel, ...TCmd[]] | undefined,
