@@ -53,11 +53,14 @@ export const { update, initial } = enhance(
             m.states.loading({ loadingStarted: msg.now }),
             m.cmds.startLoadingAnimation(),
         ],
+        finished_loading: (msg, model) => [
+            model,
+        ],
     })
 
 
 describe('extra flow msg', () => {
-    it('should call msg form extra flow', () => {
+    it('should call msg `started_loading` from extra flow', () => {
         let [state, ...cmds] = initial()
         expect(state).toEqual({ state: "initial" })
         expect(cmds).toEqual([])
@@ -66,5 +69,18 @@ describe('extra flow msg', () => {
             ;[state, ...cmds] = update({ type: "started_loading", now: now }, state)
         expect(state).toEqual({ state: "loading", loadingStarted: now })
         expect(cmds).toEqual([{ type: "startLoadingAnimation" }])
+    })
+
+    it('should not call msg `finished_loading` from extra flow', () => {
+        let [state, ...cmds] = initial()
+        expect(state).toEqual({ state: "initial" })
+        expect(cmds).toEqual([])
+
+        const start = Date.now()
+            ;[state, ...cmds] = update({ type: "started_loading", now: start }, state)
+
+        const finish = Date.now()
+            ;[state, ...cmds] = update({ type: "finished_loading", now: finish }, state)
+        expect(state).toEqual({ state: "loaded", loadingStarted: start, loadingFinished: finish })
     })
 })
