@@ -22,7 +22,8 @@
   },
   "scripts": {
     "build": "npm run type-check && unbuild",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
