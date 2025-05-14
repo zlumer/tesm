@@ -3,9 +3,9 @@ import { SpecificState } from "tesm"
 import { AuthFlowSimple } from "../state"
 import { useAuthContext } from "./context"
 
-type LoadedModel = SpecificState<AuthFlowSimple.Model, "authed">
+type AuthedModel = SpecificState<AuthFlowSimple.Model, "authed">
 
-const App = (props: LoadedModel) => {
+const App = (props: AuthedModel) => {
 	const userData = { username: "Username" } /** extracted from props.jwt */
 	return (
 		<div>
