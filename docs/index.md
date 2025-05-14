@@ -4,7 +4,6 @@ layout: home
 
 hero:
     name: "TESM"
-    image: example.svg
     text: "The Elm State Machine"
     tagline: Expressive, concise and robust state management for typescript ecosystem
     actions:
