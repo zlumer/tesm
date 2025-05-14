@@ -24,8 +24,8 @@ features:
       details: Use concepts from The Elm Architecture (Model, Msg, Cmd). Manage application state in a totally pure way
 ---
 
-## Traffic Light State Machine Example
+## Simple Auth Flow Example
 
-[View full example](/docs/examples/traffic-light)
+[View full example](/docs/examples/auth-flow)
 
-<<< @/../src/examples/trafficLight.ts#example
+<<< @/../src/examples/auth-simple/state.ts

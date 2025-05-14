@@ -32,8 +32,8 @@ const m = machine(
     {
         auth_requested: (username: string, password: string) => ({ username, password }),
         jwt_arrived: (jwt: string, expiry: number, refreshToken: string) => ({ jwt, expiry, refreshToken }),
-        jwt_request_failed: (error: unknown, nowMs: number) => ({ error, nowMs }),
-        refresh_token_expired: (nowMs: number) => ({ nowMs }),
+        jwt_request_failed: (error: unknown, now: number) => ({ error, now }),
+        refresh_token_expired: () => ({}),
     },
     {
         requestJwt: (username: string, password: string) => ({ username, password }),
@@ -68,11 +68,11 @@ const AuthState = enhance(
                 m.states.authed({ jwt: msg.jwt, jwtExpiryMs: msg.expiry * 1000, refreshToken: msg.refreshToken, jwtRetriesLeft: JWT_RETRIES }),
             ],
             jwt_request_failed: (msg, model) => {
-                let isExpired = msg.nowMs >= model.jwtExpiryMs
+                let isExpired = msg.now >= model.jwtExpiryMs
 
                 if (!isExpired) return [
                     m.states.authed({ ...model, jwtRetriesLeft: model.jwtRetriesLeft - 1 }),
-                    m.cmds.refreshJwt(model.refreshToken, msg.nowMs + JWT_RETRY_DELAY),
+                    m.cmds.refreshJwt(model.refreshToken, msg.now + JWT_RETRY_DELAY),
                 ];
 
                 if (model.jwtRetriesLeft <= 0) // we probably don't have network right now, start exponential backoff
@@ -80,12 +80,12 @@ const AuthState = enhance(
                     let exponentialBackoff = Math.pow(2, -model.jwtRetriesLeft) * JWT_RETRY_DELAY
                     return [
                         m.states.auth_expired_no_network({ exponentialRetries: 0, refreshToken: model.refreshToken }),
-                        m.cmds.refreshJwt(model.refreshToken, msg.nowMs + exponentialBackoff)
+                        m.cmds.refreshJwt(model.refreshToken, msg.now + exponentialBackoff)
                     ];
                 }
                 return [
                     m.states.authed({ ...model, jwtRetriesLeft: model.jwtRetriesLeft - 1 }),
-                    m.cmds.refreshJwt(model.refreshToken, msg.nowMs + JWT_RETRY_DELAY),
+                    m.cmds.refreshJwt(model.refreshToken, msg.now + JWT_RETRY_DELAY),
                 ];
             },
             refresh_token_expired: (msg, model) => [
@@ -96,11 +96,11 @@ const AuthState = enhance(
             jwt_arrived: (msg, model) => [
                 m.states.authed({ jwt: msg.jwt, jwtExpiryMs: msg.expiry * 1000, refreshToken: msg.refreshToken, jwtRetriesLeft: JWT_RETRIES }),
             ],
-            refresh_token_expired: (msg, model) => {
+            jwt_request_failed: (msg, model) => {
                 let exponentialBackoff = Math.pow(2, model.exponentialRetries) * JWT_RETRY_DELAY
                 return [
                     m.states.auth_expired_no_network({ ...model, exponentialRetries: model.exponentialRetries + 1 }),
-                    m.cmds.refreshJwt(model.refreshToken, msg.nowMs + exponentialBackoff),
+                    m.cmds.refreshJwt(model.refreshToken, msg.now + exponentialBackoff),
                 ];
             }
         },

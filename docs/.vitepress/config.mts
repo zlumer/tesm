@@ -22,7 +22,6 @@ export default defineConfig({
       }, {
         text: "Examples",
         items: [
-          { text: 'Traffic light', link: '/docs/examples/traffic-light' },
           { text: 'Auth flow', link: '/docs/examples/auth-flow' },
         ]
       }],
