@@ -1,5 +1,4 @@
 // #region example-full
-// #region example
 import { machine, st, XMsg, XModel, XCmd, enhance } from "tesm"
 
 type InitialContext = {
@@ -36,6 +35,7 @@ const m = machine(
     }
 )
 
+// #region example
 const AppLoadingState = enhance(
     m,
     "AppLoadingState",
@@ -76,6 +76,7 @@ const AppLoadingState = enhance(
         }
     }
 )
+// #endregion example
 
 export namespace AppLoading {
     export type Msg = XMsg<typeof AppLoadingState>
@@ -85,7 +86,7 @@ export namespace AppLoading {
     export const machine = AppLoadingState
 }
 
-// #endregion example
+
 
 type Initialize = {
     configUrl: string;
