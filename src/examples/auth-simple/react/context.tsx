@@ -9,35 +9,36 @@ const AuthContext = createContext<
 
 export const AuthProvider = () => {
 	const [state, msgs] = useTeaSimple(AuthFlowSimple.machine, {
-		requestJwt: (props) =>
-			Auth.jwt(props.username, props.password)
-				.then((res) =>
-					msgs.jwt_arrived({
-						expiry: res.expiresAt,
-						jwt: res.token,
-						refreshToken: res.refreshToken,
-					})
-				)
-				.catch((error) => msgs.jwt_request_failed({ error, now: Date.now() })),
+		requestJwt: async (props) => {
+			try {
+				const res = await Auth.jwt(props.username, props.password)
+				return msgs.jwt_arrived({
+					jwt: res.token,
+					expiry: res.expiresAt,
+					refreshToken: res.refreshToken,
+				})
+			} catch (error) {
+				return msgs.jwt_request_failed({ error, now: Date.now() })
+			}
+		},
+		refreshJwt: async ({ refreshToken, at }) => {
+			await sleep(at - Date.now())
+			try {
+				const res = await Auth.refreshJwt(refreshToken)
 
-		refreshJwt: ({ refreshToken, at }) =>
-			setTimeout(
-				() =>
-					Auth.refreshJwt(refreshToken)
-						.then((res) =>
-							res.expired
-								? msgs.refresh_token_expired({})
-								: msgs.jwt_arrived({
-										expiry: res.expiresAt,
-										jwt: res.token,
-										refreshToken: res.refreshToken,
-								  })
-						)
-						.catch((error) =>
-							msgs.jwt_request_failed({ error, now: Date.now() })
-						),
-				at - Date.now()
-			),
+				if (res.expired) {
+					return msgs.refresh_token_expired({})
+				}
+
+				return msgs.jwt_arrived({
+					jwt: res.token,
+					expiry: res.expiresAt,
+					refreshToken: res.refreshToken,
+				})
+			} catch (error) {
+				return msgs.jwt_request_failed({ error, now: Date.now() })
+			}
+		},
 	})
 	return <AuthContext.Provider value={{ model: state, msgs }}> </AuthContext.Provider>
 }
@@ -50,6 +51,8 @@ export function useAuthContext() {
 }
 
 // #endregion example
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 type RefreshJwtResponse =
 	| {
