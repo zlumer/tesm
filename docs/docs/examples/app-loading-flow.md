@@ -1,9 +1,9 @@
 ---
-title: Auth flow example
-description: Auth flow example
+title: App loading flow example
+description: App loading flow example
 ---
 
-# Auth flow example
+# App loading flow example
 
 ## Machine
 
