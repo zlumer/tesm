@@ -23,7 +23,7 @@ features:
       details: Use concepts from The Elm Architecture (Model, Msg, Cmd). Manage application state in a totally pure way
 ---
 
-## Simple Auth Flow Example
+## Simple App Loading Flow Example
 
 [View full example](/docs/examples/app-loading-flow)
 
