@@ -25,6 +25,6 @@ features:
 
 ## Simple Auth Flow Example
 
-[View full example](/docs/examples/auth-flow)
+[View full example](/docs/examples/app-loading-flow)
 
-<<< @/../src/examples/auth-simple/state.ts
+<<< @/../src/examples/app-loading/state.ts#example
