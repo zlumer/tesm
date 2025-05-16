@@ -22,7 +22,7 @@ export default defineConfig({
       }, {
         text: "Examples",
         items: [
-          { text: 'Auth flow', link: '/docs/examples/auth-flow' },
+          { text: 'App Loading Flow', link: '/docs/examples/auth-flow' },
         ]
       }],
 
