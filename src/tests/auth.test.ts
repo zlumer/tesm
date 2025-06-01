@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { Auth } from '../examples/auth'
+import { Auth } from './machines/auth'
 
 const { init, update } = Auth
 

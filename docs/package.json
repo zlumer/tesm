@@ -5,6 +5,9 @@
     "@types/node": "^22.14.1",
     "vitepress": "^1.6.3"
   },
+  "dependencies": {
+    "tesm": "file:../"
+  },
   "scripts": {
     "docs:dev": "vitepress dev",
     "docs:build": "vitepress build",

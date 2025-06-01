@@ -27,4 +27,4 @@ features:
 
 [View full example](/docs/examples/app-loading-flow)
 
-<<< @/../src/examples/app-loading/state.ts#example
+<<< @/examples/app-loading/state.ts#example

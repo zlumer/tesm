@@ -31,7 +31,7 @@ In this example we will develop a small state that handles a subset of the appli
 
 1. Import the required components:
 
-<<< @/../src/examples/loading.ts#import
+<<< @/examples/loading.ts#import
 
 ---
 
@@ -42,7 +42,7 @@ Every **state** has a **context** where all the data is stored. Context is basic
 
 2. Let's create **context types** for when the loading process has just started and when the loading process has completed.
 
-<<< @/../src/examples/loading.ts#types
+<<< @/examples/loading.ts#types
 
 `loadingStarted` is the time when loading has started. `loadingFinished` is the time when loading has finished.
 
@@ -62,7 +62,7 @@ const m = machine({
 
 to less boilerplate use an imported **`st()`** function
 
-<<< @/../src/examples/loading.ts#part1
+<<< @/examples/loading.ts#part1
 
 We pass an object as `machine` first argument where the field names are state names and values are functions that serve as a strictly typed boilerplate.
 
@@ -77,7 +77,7 @@ You can think of `Msg` as events that happen in outside world and are passed to 
 
 4. Let's create a couple of `Msg`.
 
-<<< @/../src/examples/loading.ts#part2
+<<< @/examples/loading.ts#part2
 
 msg structure is similar to state: we pass as `machine` second argument an object with `Msg` names and generator functions.
 
@@ -88,7 +88,7 @@ The convention for `Msg` names is `snake_case` and past tense verbs. These are t
 
 5. Let's create a couple of `Cmd`.
 
-<<< @/../src/examples/loading.ts#part3
+<<< @/examples/loading.ts#part3
 
 `Cmd` are almost identical to `Msg`, the only difference being the naming convention: `Cmd` names are `camelCase` and use present tense verbs. You should name `Cmd` the same way you name methods in your code.  
 `loadUserInfo(uid: string)`, `todo.create(name: string)` and `cancelLoading` are all good names for `Cmd`.
@@ -97,7 +97,7 @@ The convention for `Msg` names is `snake_case` and past tense verbs. These are t
 
 6. Let's extract types from our machine for future use.
 
-<<< @/../src/examples/loading.ts#extractedTypes
+<<< @/examples/loading.ts#extractedTypes
 
 ---
 
@@ -137,7 +137,7 @@ Let's create our state transition logic by passing the object to the **`enhance(
 
 Try use autocomplete between curly braces and it will suggest the initial state and messages to you.
 
-<<< @/../src/examples/loading.ts#enhanced
+<<< @/examples/loading.ts#enhanced
 
 We're using [pattern matching](https://stackoverflow.com/questions/2502354/what-is-pattern-matching-in-functional-languages) to process incoming messages based on their types and current state type.
 
@@ -147,7 +147,7 @@ The `enhance` function will throw an error if current state cannot handle the me
 
 Let's focus on the return value in this part of the code:
 
-<<< @/../src/examples/loading.ts#focus
+<<< @/examples/loading.ts#focus
 
 First element of the array is the updated state. States should always be immutable and it's up to you to make sure that none of the fields of the states are ever changed. Use [spread syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) where applicable.  
 Based on the state definitions from step 3 of this tutorial. TypeScript checks that all of the required parameters were passed to the state context and ensures type safety
@@ -161,4 +161,4 @@ Let's take a look at the full code of the example before proceeding to the _oute
 
 ## Complete code of the example
 
-<<< @/../src/examples/loading.ts#completeCode
+<<< @/examples/loading.ts#completeCode

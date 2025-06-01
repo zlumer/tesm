@@ -1,5 +1,5 @@
 import { it, expect, vi, describe } from 'vitest'
-import { LoadingState } from '../../examples/loading'
+import { LoadingState } from '../machines/loading'
 import { useTeaSimple } from '../../react'
 import { renderHook, act } from '@testing-library/react'
 import { StrictMode } from 'react'
