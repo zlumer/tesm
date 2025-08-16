@@ -3,6 +3,7 @@ import { LoadingState } from '../machines/loading'
 import { useTeaSimple } from '../../react'
 import { renderHook, act } from '@testing-library/react'
 import { StrictMode } from 'react'
+import { CounterState } from '../machines/counter'
 
 describe("StrictMode", () => {
     it("commands are not duplicated", () => {
@@ -57,6 +58,40 @@ describe("StrictMode", () => {
                 text: `Loading finished in 1000 milliseconds!`
             })
         )
+    })
+
+    it("uses latest command handlers after rerender", () => {
+        const firstHandlers = {
+            log: vi.fn(),
+        }
+
+        const secondHandlers = {
+            log: vi.fn(),
+        }
+        const { result, rerender } = renderHook(
+            ({ handlers }) => useTeaSimple(CounterState, handlers),
+            {
+                initialProps: { handlers: firstHandlers },
+                wrapper: StrictMode
+            }
+        )
+
+        act(() => {
+            result.current[1].inc({})
+        })
+
+        expect(result.current[0]).toEqual({ state: 'active', value: 1 })
+        expect(firstHandlers.log).toHaveBeenCalledTimes(1)
+        expect(secondHandlers.log).not.toHaveBeenCalled()
+
+        rerender({ handlers: secondHandlers })
+
+        act(() => {
+            result.current[1].inc({})
+        })
+        expect(result.current[0]).toEqual({ state: 'active', value: 2 })
+        expect(secondHandlers.log).toHaveBeenCalledTimes(1)
+        expect(firstHandlers.log).toHaveBeenCalledTimes(1)
     })
 })
 
