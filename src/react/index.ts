@@ -19,7 +19,7 @@ export function useTea<
 	const hook = useMemo(() => createHook(update)(init), [init, update])
 
 	useEffect(() => {
-		hook.addHandler(handleCmd)
+		return hook.addHandler(handleCmd)
 	}, [handleCmd])
 
 	const state = useSyncExternalStore(
