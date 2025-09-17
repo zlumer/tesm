@@ -1,6 +1,5 @@
 import { Dispatch, useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react"
 import { createHandler } from "../tesm"
-import { useEvent } from "react-use-event-hook"
 import { createHook } from "../hook"
 
 
@@ -51,7 +50,7 @@ export function useTeaSimple<
 		) => Extract<Msg, { type: key }>
 	}
 ] {
-	const handler = useEvent(createHandler(cmds))
+	const handler = createHandler(cmds)
 	const [state, dispatch] = useTea(machine.initial, machine.update, handler)
 	const msgs = useMemo(() => createMsgs(dispatch), [dispatch])
 	const res = useMemo(() => [state, msgs] as const, [state, msgs])
