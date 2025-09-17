@@ -1,68 +1,82 @@
-import { useState, useEffect } from "react"
+import { Dispatch, useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react"
+import { createHandler } from "../tesm"
+import { useEvent } from "react-use-event-hook"
+import { createHook } from "../hook"
 
-export function useTesmSync<Model, Msg, Cmd>(
-	update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]],
-	initial: () => readonly [Model, ...Cmd[]],
-	effectHandler: (cmd: Cmd, send: (msg: Msg) => void) => void,
-): [Model, (msg: Msg) => void, () => void]
-{
-	const [[model, ...cmds], setState] = useState(() => initial())
-	const send = (msg: Msg) => setState(s =>
-	{
-		const [model, ...oldCmds] = s
-		
-		const [mm, ...cmds] = update(msg, model)
-		for (let cmd of oldCmds.concat(cmds))
-			effectHandler(cmd, send)
-		
-		return [mm]
-	})
 
-	let cancelled = false
-	const reset = () => setState(() => initial())
+/**
+ * React Hook that creates a TEA-like reducer from State, Msg, and Cmd
+ */
+export function useTea<
+	Model extends { state: string },
+	Msg extends { type: string },
+	Cmd extends { type: string }
+>(
+	init: () => readonly [Model, ...Cmd[]],
+	update: (msg: Msg, state: Model) => readonly [Model, ...Cmd[]],
+	handleCmd: (cmd: Cmd) => void
+): [Model, (msg: Msg) => void] {
+	const hook = useMemo(() => createHook(update)(init), [init, update])
 
-	let cancel = () => { cancelled = true }
+	useEffect(() => {
+		return hook.addHandler(handleCmd)
+	}, [handleCmd])
 
-	// console.log(`[USE-TESM]: before effect ${cmds.length}`)
-	useEffect(() =>
-	{
-		// console.log(`[USE-TESM]: effect ${cancelled} ${cmds.length}`)
-		if (cancelled)
-			return cancel
-		
-		if (!cmds.length)
-			return cancel
-		
-		setState([model])
+	const state = useSyncExternalStore(
+		hook.subscribe,
+		hook.getState
+	)
 
-		for (let cmd of cmds)
-		{
-			// console.log(`[USE-TESM]: cmd ${cancelled}`, cmd)
-			effectHandler(cmd, send)
-		}
+	const dispatch = useCallback(hook.send, [hook])
 
-		return cancel
-	}, [cmds.length, cancelled])
 
-	return [model, send, reset]
+	return [state, dispatch]
 }
-export function useTesmEasy<Model, Msg, Cmd, MsgCreator>(machine: {
-		update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]],
-		initial: () => readonly [Model, ...Cmd[]],
-		msgCreator: (send: (msg: Msg) => void) => MsgCreator,
+
+export function useTeaSimple<
+	Model extends { state: string },
+	Msg extends { type: string },
+	Cmd extends { type: string }
+>(
+	machine: {
+		initial: () => readonly [Model, ...Cmd[]]
+		update: (msg: Msg, state: Model) => readonly [Model, ...Cmd[]]
 	},
-	effectHandler: (cmd: Cmd, send: (msg: Msg) => void) => void
-)
-{
-	return useTesmWithCreator(machine.update, machine.initial, effectHandler, machine.msgCreator)
+	cmds: { [key in Cmd["type"]]: (cmd: Extract<Cmd, { type: key }>) => any }
+): readonly [
+	Model,
+	{
+		[key in Msg["type"]]: (
+			params: Omit<Extract<Msg, { type: key }>, "type">
+		) => Extract<Msg, { type: key }>
+	}
+] {
+	const handler = useEvent(createHandler(cmds))
+	const [state, dispatch] = useTea(machine.initial, machine.update, handler)
+	const msgs = useMemo(() => createMsgs(dispatch), [dispatch])
+	const res = useMemo(() => [state, msgs] as const, [state, msgs])
+	return res
 }
-export function useTesmWithCreator<Model, Msg, Cmd, MsgCreator>(
-	update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]],
-	initial: () => readonly [Model, ...Cmd[]],
-	effectHandler: (cmd: Cmd, send: (msg: Msg) => void) => void,
-	msgCreator: (send: (msg: Msg) => void) => MsgCreator
-): [Model, MsgCreator, () => void]
-{
-	const [model, send, reset] = useTesmSync(update, initial, effectHandler)
-	return [model, msgCreator(send), reset]
+
+export type MsgsProxy<Msg extends { type: string }> = {
+	[key in Msg["type"]]: (
+		params: Omit<Extract<Msg, { type: key }>, "type">
+	) => Extract<Msg, { type: key }>
 }
+export function createMsgs<Msg extends { type: string }>(
+	dispatch: Dispatch<Msg>
+): MsgsProxy<Msg> {
+	let proxy = new Proxy(
+		{},
+		{
+			get(target, prop) {
+				return (params: any) => {
+					// console.log("dispatching", prop, params)
+					dispatch({ type: prop as string, ...params })
+				}
+			},
+		}
+	)
+	return proxy as any
+}
+

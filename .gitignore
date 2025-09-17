@@ -104,3 +104,7 @@ dist
 .tern-port
 
 /dist
+.aider*
+
+**/.vitepress/dist
+**/.vitepress/cache
