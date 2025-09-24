@@ -35,47 +35,21 @@ export function useTea<
 export function useTeaSimple<
 	Model extends { state: string },
 	Msg extends { type: string },
-	Cmd extends { type: string }
+	Cmd extends { type: string },
+	MsgCreator
 >(
 	machine: {
 		initial: () => readonly [Model, ...Cmd[]]
 		update: (msg: Msg, state: Model) => readonly [Model, ...Cmd[]]
+		msgCreator: (send: (msg: Msg) => void) => MsgCreator,
 	},
 	cmds: { [key in Cmd["type"]]: (cmd: Extract<Cmd, { type: key }>) => any }
 ): readonly [
 	Model,
-	{
-		[key in Msg["type"]]: (
-			params: Omit<Extract<Msg, { type: key }>, "type">
-		) => Extract<Msg, { type: key }>
-	}
+	MsgCreator
 ] {
 	const handler = createHandler(cmds)
 	const [state, dispatch] = useTea(machine.initial, machine.update, handler)
-	const msgs = useMemo(() => createMsgs(dispatch), [dispatch])
-	const res = useMemo(() => [state, msgs] as const, [state, msgs])
-	return res
+	const msgs = useMemo(() => machine.msgCreator(dispatch), [dispatch])
+	return useMemo(() => [state, msgs] as const, [state, msgs])
 }
-
-export type MsgsProxy<Msg extends { type: string }> = {
-	[key in Msg["type"]]: (
-		params: Omit<Extract<Msg, { type: key }>, "type">
-	) => Extract<Msg, { type: key }>
-}
-export function createMsgs<Msg extends { type: string }>(
-	dispatch: Dispatch<Msg>
-): MsgsProxy<Msg> {
-	let proxy = new Proxy(
-		{},
-		{
-			get(target, prop) {
-				return (params: any) => {
-					// console.log("dispatching", prop, params)
-					dispatch({ type: prop as string, ...params })
-				}
-			},
-		}
-	)
-	return proxy as any
-}
-
