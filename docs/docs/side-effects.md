@@ -37,13 +37,13 @@ function App() {
 		<div>
 			<button
 				disabled={model.state === "loading"}
-				onClick={() => msgs.started_loading({ now: Date.now() })}
+				onClick={() => msgs.started_loading(Date.now())}
 			>
 				start load
 			</button>
 			<button
 				disabled={model.state !== "loading"}
-				onClick={() => msgs.finished_loading({ now: Date.now() })}
+				onClick={() => msgs.finished_loading(Date.now())}
 			>
 				finish load
 			</button>

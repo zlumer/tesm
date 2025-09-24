@@ -1,10 +1,10 @@
 // #region example
 import { createContext, PropsWithChildren, useContext } from "react"
 import { AppLoading } from "../state"
-import { MsgsProxy, useTeaSimple } from "tesm/react"
+import { useTeaSimple } from "tesm/react"
 
 const GlobalStateContext = createContext<
-	{ model: AppLoading.Model; msgs: MsgsProxy<AppLoading.Msg> } | undefined
+	{ model: AppLoading.Model; msgs: AppLoading.Msgs } | undefined
 >(undefined)
 
 export const GlobalStateProvider: React.FC<PropsWithChildren> = (props) => {
@@ -12,25 +12,18 @@ export const GlobalStateProvider: React.FC<PropsWithChildren> = (props) => {
 		initialize: async () => {
 			await sleep(1000)
 			return msgs.initialized({
-				data: {
-					configUrl: "https://example.com/config.json",
-					userId: "user123",
-					username: "user",
-				},
+				configUrl: "https://example.com/config.json",
+				userId: "user123",
+				username: "user",
 			})
 		},
 		loadConfig: async (configUrl) => {
 			await sleep(1000)
-			return msgs.config_loaded({
-				config: {},
-				now: Date.now(),
-			})
+			return msgs.config_loaded({}, Date.now())
 		},
 		loadLocalStorage: async () => {
 			await sleep(1000)
-			return msgs.local_storage_loaded({
-				localSave: {},
-			})
+			return msgs.local_storage_loaded({})
 		},
 	})
 	return (

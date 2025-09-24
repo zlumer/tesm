@@ -79,7 +79,7 @@ const AppLoadingState = enhance(
 // #endregion example
 
 export namespace AppLoading {
-    export type Msg = XMsg<typeof AppLoadingState>
+    export type Msgs = ReturnType<typeof AppLoadingState.msgCreator>;
     export type Cmd = XCmd<typeof AppLoadingState>
     export type Model = XModel<typeof AppLoadingState>
 
