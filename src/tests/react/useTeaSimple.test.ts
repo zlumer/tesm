@@ -17,7 +17,7 @@ describe("StrictMode", () => {
         )
 
         act(() => {
-            result.current[1].started_loading({ now: 1000 })
+            result.current[1].started_loading(1000)
         })
 
         expect(mockHandlers.startLoadingAnimation).toHaveBeenCalledTimes(1);
@@ -38,14 +38,14 @@ describe("StrictMode", () => {
         expect(result.current[1]).toBeDefined()
 
         act(() => {
-            result.current[1].started_loading({ now: 1000 })
+            result.current[1].started_loading(1000)
         })
 
         expect(result.current[0]).toEqual({ state: 'loading', loadingStarted: 1000 })
         expect(mockHandlers.startLoadingAnimation).toHaveBeenCalledTimes(1);
 
         act(() => {
-            result.current[1].finished_loading({ now: 2000 })
+            result.current[1].finished_loading(2000)
         })
 
         expect(result.current[0]).toEqual({
@@ -68,6 +68,7 @@ describe("StrictMode", () => {
         const secondHandlers = {
             log: vi.fn(),
         }
+        
         const { result, rerender } = renderHook(
             ({ handlers }) => useTeaSimple(CounterState, handlers),
             {
@@ -77,7 +78,7 @@ describe("StrictMode", () => {
         )
 
         act(() => {
-            result.current[1].inc({})
+            result.current[1].inc()
         })
 
         expect(result.current[0]).toEqual({ state: 'active', value: 1 })
@@ -87,7 +88,7 @@ describe("StrictMode", () => {
         rerender({ handlers: secondHandlers })
 
         act(() => {
-            result.current[1].inc({})
+            result.current[1].inc()
         })
         expect(result.current[0]).toEqual({ state: 'active', value: 2 })
         expect(secondHandlers.log).toHaveBeenCalledTimes(1)
