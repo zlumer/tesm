@@ -6,7 +6,7 @@
     "vitepress": "^1.6.3"
   },
   "dependencies": {
-    "tesm": "file:../"
+    "tesm": "../"
   },
   "scripts": {
     "docs:dev": "vitepress dev",
