@@ -105,7 +105,7 @@ export type FlowDescriber<
 	TMsg extends { type: string },
 	TCmd
 > = {
-		[state in TState["state"]]?: {
+		[state in TState["state"]]: {
 			[msg in TMsg["type"]]?: (
 				msg: Extract<
 					TMsg,

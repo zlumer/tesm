@@ -31,8 +31,8 @@ export type Cmd = XCmd<typeof m>
 export type Model = XModel<typeof m>
 
 export const LoadingState = enhance(
-    m, 
-    "LoadingState", 
+    m,
+    "LoadingState",
     () => [m.states.initial({})],
     {
         initial: {
@@ -52,4 +52,5 @@ export const LoadingState = enhance(
                 ),
             ],
         },
+        loaded: {}
     })

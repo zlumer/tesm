@@ -54,6 +54,7 @@ export const LoadingState = enhance(
                 ),
             ],
         },
+        loaded: {}
     })
 
 describe('LoadingState', () => {

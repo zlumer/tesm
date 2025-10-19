@@ -46,6 +46,7 @@ export const { update, initial } = enhance(
                 ),
             ],
         },
+        loaded: {}
     },
     // Messages from the extra flow will be used in all transitions where they are not explicitly handled in the main flow
     {
