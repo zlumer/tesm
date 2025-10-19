@@ -45,7 +45,7 @@ const machine = enhance(m, "MachineName", initial, flow, {
 });
 ```
 
-## Ignore Transition
+## Ignoring Transition
 
 In machine there is a helper `ignore` that returns current model, so transition is simply ignored
 
