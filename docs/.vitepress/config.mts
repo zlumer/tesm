@@ -25,9 +25,9 @@ export default defineConfig({
           { text: 'App Loading Flow', link: '/docs/examples/app-loading-flow' },
         ]
       }, {
-        text: "Advanced",
+        text: "Other",
         items: [
-          { text: 'Error Handling', link: '/docs/advanced/error-handling' },
+          { text: 'Error Handling', link: '/docs/other/error-handling' },
         ]
       }],
 
