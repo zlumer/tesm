@@ -1,6 +1,6 @@
 // #region completeCode
 // #region import
-import { machine, st, XMsg, XModel, XCmd, enhance } from "tesm"
+import { machine, st, XMsg, XModel, XCmd, enhanceMachine } from "tesm"
 // #endregion import 
 
 // #region types
@@ -43,7 +43,7 @@ export type Model = XModel<typeof m>
 // #endregion extractedTypes
 
 // #region enhanced
-export const LoadingState = enhance(
+export const LoadingState = enhanceMachine(
     m, // our machine 
     "LoadingState", // machine name for debug
     () => [m.states.initial({})], // initial state and commands
@@ -67,6 +67,7 @@ export const LoadingState = enhance(
                 ),
             ],
         },
+        loaded: {}
     })
 // #endregion enhanced
 // #endregion completeCode

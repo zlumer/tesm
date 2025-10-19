@@ -1,5 +1,5 @@
 // #region example-full
-import { machine, st, XMsg, XModel, XCmd, enhance } from "tesm"
+import { machine, st, XMsg, XModel, XCmd, enhanceMachine } from "tesm"
 
 type InitialContext = {
     loadingStarted: number;
@@ -36,7 +36,7 @@ const m = machine(
 )
 
 // #region example
-const AppLoadingState = enhance(
+const AppLoadingState = enhanceMachine(
     m,
     "AppLoadingState",
     () => [m.states.initial({ loadingStarted: Date.now() }), m.cmds.loadLocalStorage()],
@@ -73,7 +73,8 @@ const AppLoadingState = enhance(
                     }),
                 ];
             }
-        }
+        },
+        loaded: {}
     }
 )
 // #endregion example

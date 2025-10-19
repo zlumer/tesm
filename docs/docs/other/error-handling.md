@@ -2,7 +2,7 @@
 
 ## Type Safety
 
-TESM provides strict type checking at compile time. When creating a state machine using `enhance()`, TypeScript verifies that:
+TESM provides strict type checking at compile time. When creating a state machine using `enhanceMachine()`, TypeScript verifies that:
 
 1. All states from `Model` have corresponding handlers in `flow`
 2. All handlers in `flow` correspond to existing states
@@ -15,7 +15,7 @@ When a message cannot be handled in the current state, TESM will throw an except
 ```ts
 import { invalidStateMsg } from "tesm"
 
-const machine = enhance(m, "MachineName", initial, flow, extras, {
+const machine = enhanceMachine(m, "MachineName", initial, flow, extras, {
     onInvalidState: (machine, msg, model) => {
         console.error(`Invalid state transition in ${machine}: ${model.state}.${msg.type}`);
     },
@@ -27,17 +27,17 @@ const machine = enhance(m, "MachineName", initial, flow, extras, {
 ```
 
 The `onInvalidState` handler receives:
-- `machine`: State machine name (second argument of enhance)
+- `machine`: State machine name (second argument of enhanceMachine)
 - `msg`: Message that cannot be handled
 - `model`: Current state model
 
 
 ## Universal Message Handlers
 
-The `extras` parameter of the `enhance()` function allows you to define message handlers that will be called if the current state doesn't have its own handler for that message.
+The `extras` parameter of the `enhanceMachine()` function allows you to define message handlers that will be called if the current state doesn't have its own handler for that message.
 
 ```ts
-const machine = enhance(m, "MachineName", initial, flow, {
+const machine = enhanceMachine(m, "MachineName", initial, flow, {
     some_message: (msg, model) => [
         m.states.some_state({}),
         m.cmds.some_cmd()
@@ -50,7 +50,7 @@ const machine = enhance(m, "MachineName", initial, flow, {
 In machine there is a helper `ignore` that returns current model, so transition is simply ignored
 
 ```ts
-const machine = enhance(m, "MachineName", initial, flow, {
+const machine = enhanceMachine(m, "MachineName", initial, flow, {
     other_message: m.ignore,
 });
 ```

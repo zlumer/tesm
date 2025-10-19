@@ -5,7 +5,7 @@ description: Quick guide to TESM
 
 # Side effects
 
-So far we've been writing our state in full isolation: we have **states**, **Msg**, **Cmd** and the transition logic inside **enhance()**, but it's just a bunch of pure functions and raw data.  
+So far we've been writing our state in full isolation: we have **states**, **Msg**, **Cmd** and the transition logic inside **enhanceMachine()**, but it's just a bunch of pure functions and raw data.  
 In this section of the tutorial we get to the interesting part: integrating this pure state to the real world application full of side effects and asynchronicity.
 
 ## React

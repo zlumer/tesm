@@ -1,4 +1,4 @@
-import { machine, enhance, XModel, XMsg, XCmd } from "../../utils/machine";
+import { machine, enhanceMachine, XModel, XMsg, XCmd } from "../../utils/machine";
 import { st } from "../../utils/misc";
 
 type BaseContext = {
@@ -77,7 +77,7 @@ const JWT_RETRIES = 5
 const JWT_REFRESH_BEFORE_EXPIRY = 30_000
 const JWT_RETRY_DELAY = 3_000
 
-const enhanced = enhance(m, "auth", () => [m.states.initial({})], {
+const enhanced = enhanceMachine(m, "auth", () => [m.states.initial({})], {
     initial: {
         "ui.auth_requested": (msg, state) => [
             m.states.checking_for_existing_refresh_token({ tgid: msg.tgid, did: msg.did }),

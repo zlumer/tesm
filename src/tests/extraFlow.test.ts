@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { machine, enhance } from '../utils/machine'
+import { machine, enhanceMachine } from '../utils/machine'
 import { st } from '../utils/misc'
 
 type InitialContext = {}
@@ -27,7 +27,7 @@ const m = machine(
     }
 )
 
-export const { update, initial } = enhance(
+export const { update, initial } = enhanceMachine(
     m,
     "LoadingState",
     () => [m.states.initial({})],

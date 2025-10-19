@@ -105,6 +105,29 @@ export type FlowDescriber<
 	TMsg extends { type: string },
 	TCmd
 > = {
+		[state in TState["state"]]?: {
+			[msg in TMsg["type"]]?: (
+				msg: Extract<
+					TMsg,
+					{
+						type: msg
+					}
+				>,
+				model: Extract<
+					TState,
+					{
+						state: state
+					}
+				>
+			) => readonly [TState, ...TCmd[]]
+		}
+	}
+
+export type FlowDescriberRequiredStates<
+	TState extends { state: string },
+	TMsg extends { type: string },
+	TCmd
+> = {
 		[state in TState["state"]]: {
 			[msg in TMsg["type"]]?: (
 				msg: Extract<
@@ -170,14 +193,32 @@ export type XModel<Machine extends RawMachine> = ExtractValues<Machine["states"]
 export type XMsg<Machine extends RawMachine> = ExtractValues<Machine["msgs"]>
 export type XCmd<Machine extends RawMachine> = ExtractValues<Machine["cmds"]>
 
-type FlowOptions<TState extends { state: string }, TMsg extends { type: string }> = {
-	onInvalidState: InvalidStateCallback<TState, TMsg>
-}
 export const enhance = <Machine extends _MachineBase>(
 	m: Machine,
 	name: string = "",
 	initial: () => readonly [XModel<Machine>, ...XCmd<Machine>[]],
 	flow: FlowDescriber<XModel<Machine>, XMsg<Machine>, XCmd<Machine>>,
+	extras: FlowDescriberExtra<XModel<Machine>, XMsg<Machine>, XCmd<Machine>> = {},
+) => {
+	return {
+		...m,
+		initial,
+		update: simpleFlow<XModel<Machine>, XMsg<Machine>, XCmd<Machine>>(
+			name,
+			mixin(flow, extras, Object.keys(m.states)),
+		),
+	}
+}
+
+type FlowOptions<TState extends { state: string }, TMsg extends { type: string }> = {
+	onInvalidState?: InvalidStateCallback<TState, TMsg>
+}
+
+export const enhanceMachine = <Machine extends _MachineBase>(
+	m: Machine,
+	name: string = "",
+	initial: () => readonly [XModel<Machine>, ...XCmd<Machine>[]],
+	flow: FlowDescriberRequiredStates<XModel<Machine>, XMsg<Machine>, XCmd<Machine>>,
 	extras: FlowDescriberExtra<XModel<Machine>, XMsg<Machine>, XCmd<Machine>> = {},
 	options?: FlowOptions<XModel<Machine>, XMsg<Machine>>
 ) => {
