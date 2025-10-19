@@ -24,6 +24,11 @@ export default defineConfig({
         items: [
           { text: 'App Loading Flow', link: '/docs/examples/app-loading-flow' },
         ]
+      }, {
+        text: "Advanced",
+        items: [
+          { text: 'Error Handling', link: '/docs/advanced/error-handling' },
+        ]
       }],
 
     },

@@ -1,4 +1,4 @@
-import { simpleFlow, splitApply } from "../extensions"
+import { InvalidStateCallback, simpleFlow, splitApply } from "../extensions"
 import { cmd, createMsgCreator, ExtractValues, msg, state } from "../tesm"
 import { SpecificMsg, SpecificState } from "./misc"
 
@@ -170,19 +170,24 @@ export type XModel<Machine extends RawMachine> = ExtractValues<Machine["states"]
 export type XMsg<Machine extends RawMachine> = ExtractValues<Machine["msgs"]>
 export type XCmd<Machine extends RawMachine> = ExtractValues<Machine["cmds"]>
 
+type FlowOptions<TState extends { state: string }, TMsg extends { type: string }> = {
+	onInvalidState: InvalidStateCallback<TState, TMsg>
+}
 export const enhance = <Machine extends _MachineBase>(
 	m: Machine,
 	name: string = "",
 	initial: () => readonly [XModel<Machine>, ...XCmd<Machine>[]],
 	flow: FlowDescriber<XModel<Machine>, XMsg<Machine>, XCmd<Machine>>,
-	extras: FlowDescriberExtra<XModel<Machine>, XMsg<Machine>, XCmd<Machine>> = {}
+	extras: FlowDescriberExtra<XModel<Machine>, XMsg<Machine>, XCmd<Machine>> = {},
+	options?: FlowOptions<XModel<Machine>, XMsg<Machine>>
 ) => {
 	return {
 		...m,
 		initial,
 		update: simpleFlow<XModel<Machine>, XMsg<Machine>, XCmd<Machine>>(
 			name,
-			mixin(flow, extras, Object.keys(m.states))
+			mixin(flow, extras, Object.keys(m.states)),
+			options?.onInvalidState
 		),
 	}
 }
