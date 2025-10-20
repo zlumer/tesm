@@ -11,8 +11,8 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: "llms.txt", link: "./llms.txt" },
-      { text: "llms-full.txt", link: "./llms-full.txt" },
+      { text: "llms.txt", link: "/tesm/llms.txt" },
+      { text: "llms-full.txt", link: "/tesm/llms-full.txt" },
       { text: 'Docs', link: '/docs/getting-started' },
       { text: 'Home', link: '/' },
     ],
