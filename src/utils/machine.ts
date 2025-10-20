@@ -1,4 +1,4 @@
-import { simpleFlow, splitApply } from "../extensions"
+import { InvalidStateCallback, simpleFlow, splitApply } from "../extensions"
 import { cmd, createMsgCreator, ExtractValues, msg, state } from "../tesm"
 import { SpecificMsg, SpecificState } from "./misc"
 
@@ -123,6 +123,29 @@ export type FlowDescriber<
 		}
 	}
 
+export type FlowDescriberRequiredStates<
+	TState extends { state: string },
+	TMsg extends { type: string },
+	TCmd
+> = {
+		[state in TState["state"]]: {
+			[msg in TMsg["type"]]?: (
+				msg: Extract<
+					TMsg,
+					{
+						type: msg
+					}
+				>,
+				model: Extract<
+					TState,
+					{
+						state: state
+					}
+				>
+			) => readonly [TState, ...TCmd[]]
+		}
+	}
+
 type FlowDescriberExtra<
 	TModel extends { state: string },
 	TMsg extends { type: string },
@@ -175,14 +198,37 @@ export const enhance = <Machine extends _MachineBase>(
 	name: string = "",
 	initial: () => readonly [XModel<Machine>, ...XCmd<Machine>[]],
 	flow: FlowDescriber<XModel<Machine>, XMsg<Machine>, XCmd<Machine>>,
-	extras: FlowDescriberExtra<XModel<Machine>, XMsg<Machine>, XCmd<Machine>> = {}
+	extras: FlowDescriberExtra<XModel<Machine>, XMsg<Machine>, XCmd<Machine>> = {},
 ) => {
 	return {
 		...m,
 		initial,
 		update: simpleFlow<XModel<Machine>, XMsg<Machine>, XCmd<Machine>>(
 			name,
-			mixin(flow, extras, Object.keys(m.states))
+			mixin(flow, extras, Object.keys(m.states)),
+		),
+	}
+}
+
+type FlowOptions<TState extends { state: string }, TMsg extends { type: string }> = {
+	onInvalidState?: InvalidStateCallback<TState, TMsg>
+}
+
+export const defineFlow = <Machine extends _MachineBase>(
+	m: Machine,
+	name: string = "",
+	initial: () => readonly [XModel<Machine>, ...XCmd<Machine>[]],
+	flow: FlowDescriberRequiredStates<XModel<Machine>, XMsg<Machine>, XCmd<Machine>>,
+	extras: FlowDescriberExtra<XModel<Machine>, XMsg<Machine>, XCmd<Machine>> = {},
+	options?: FlowOptions<XModel<Machine>, XMsg<Machine>>
+) => {
+	return {
+		...m,
+		initial,
+		update: simpleFlow<XModel<Machine>, XMsg<Machine>, XCmd<Machine>>(
+			name,
+			mixin(flow, extras, Object.keys(m.states)),
+			options?.onInvalidState
 		),
 	}
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { machine, enhance } from '../utils/machine'
+import { machine, defineFlow } from '../utils/machine'
 import { st } from '../utils/misc'
 
 type InitialContext = {}
@@ -27,7 +27,7 @@ const m = machine(
     }
 )
 
-export const { update, initial } = enhance(
+export const { update, initial } = defineFlow(
     m,
     "LoadingState",
     () => [m.states.initial({})],
@@ -46,6 +46,7 @@ export const { update, initial } = enhance(
                 ),
             ],
         },
+        loaded: {}
     },
     // Messages from the extra flow will be used in all transitions where they are not explicitly handled in the main flow
     {

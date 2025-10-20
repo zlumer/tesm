@@ -133,7 +133,7 @@ transition logic is an object with following syntax:
 }
 ```
 
-Let's create our state transition logic by passing the object to the **`enhance()`** function as its 4th argument.
+Let's create our state transition logic by passing the object to the **`defineFlow()`** function as its 4th argument.
 
 Try use autocomplete between curly braces and it will suggest the initial state and messages to you.
 
@@ -141,7 +141,7 @@ Try use autocomplete between curly braces and it will suggest the initial state 
 
 We're using [pattern matching](https://stackoverflow.com/questions/2502354/what-is-pattern-matching-in-functional-languages) to process incoming messages based on their types and current state type.
 
-The `enhance` function will throw an error if current state cannot handle the message.
+The `defineFlow` function will throw an error if current state cannot handle the message.
 
 ---
 

@@ -1,4 +1,4 @@
-import { machine, enhance, XModel, XMsg, XCmd } from "../../utils/machine";
+import { machine, defineFlow, XModel, XMsg, XCmd } from "../../utils/machine";
 import { st } from "../../utils/misc";
 
 type CounterContext = {
@@ -19,7 +19,7 @@ const m = machine(
     }
 )
 
-export const CounterState = enhance(m, "CounterState", () => [m.states.active({ value: 0 })], {
+export const CounterState = defineFlow(m, "CounterState", () => [m.states.active({ value: 0 })], {
     active: {
         inc(_, model) {
             const newValue = model.value + 1

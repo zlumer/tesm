@@ -1,8 +1,8 @@
 import { FlowDescriber } from "./utils/machine"
 
-export function throwInvalidInFlow<TMsg, TModel, TCmd>(
+function handleInvalidInFlow<TMsg, TModel, TCmd>(
 	upd: (msg: TMsg, model: TModel) => readonly [TModel, ...TCmd[]] | undefined,
-	err: (msg: TMsg, model: TModel) => never
+	err: (msg: TMsg, model: TModel) => never | readonly [TModel]
 ): (msg: TMsg, model: TModel) => readonly [TModel, ...TCmd[]] {
 	return (msg: TMsg, model: TModel) => {
 		let ret = upd(msg, model)
@@ -31,16 +31,24 @@ export function simpleFlowNoThrow<
 	}
 }
 
-export const invalid_state = <T extends { state: string }, G extends { type: string }>(
+export const throw_invalid_state = <T extends { state: string }, G extends { type: string }>(
 	machine: string,
 	msg: G,
 	model: T
 ): never => {
-	throw new Error(
-		`[STATE MACHINE] unhandled state! ${machine}/${model.state}.${msg.type
-		}()\n${JSON.stringify(msg)}`
-	)
+	throw new Error(invalidStateMsg(machine, msg, model))
 }
+
+export const invalidStateMsg = <T extends { state: string }, G extends { type: string }>(
+	machine: string,
+	msg: G,
+	model: T
+): string => {
+	return `[STATE MACHINE] unhandled state! ${machine}/${model.state}.${msg.type
+		}()\n${JSON.stringify(msg)}`
+}
+
+export type InvalidStateCallback<TState extends { state: string }, TMsg extends { type: string }> = (machine: string, msg: TMsg, model: TState) => void
 
 export function simpleFlow<
 	TState extends { state: string },
@@ -48,11 +56,15 @@ export function simpleFlow<
 	TCmd
 >(
 	machine: string,
-	obj: FlowDescriber<TState, TMsg, TCmd>
+	obj: FlowDescriber<TState, TMsg, TCmd>,
+	onInvalidState?: InvalidStateCallback<TState, TMsg>
 ): (msg: TMsg, model: TState) => readonly [TState, ...TCmd[]] {
-	return throwInvalidInFlow(simpleFlowNoThrow(obj), (msg, model) =>
-		invalid_state(machine, msg, model)
-	)
+	return handleInvalidInFlow(simpleFlowNoThrow(obj), (msg, model) => {
+		if (!onInvalidState) return throw_invalid_state(machine, msg, model)
+
+		onInvalidState(machine, msg, model)
+		return [model]
+	})
 }
 
 

@@ -9,3 +9,6 @@ TESM is written in TypeScript. While vanilla JavaScript is supported, it is high
 # Documentation
 
 You can find the full documentation [here](https://zlumer.github.io/tesm/).
+
+- [llms.txt](https://zlumer.github.io/tesm/llms.txt)
+- [llms-full.txt](https://zlumer.github.io/tesm/llms-full.txt)

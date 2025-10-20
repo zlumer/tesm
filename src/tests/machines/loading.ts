@@ -1,4 +1,4 @@
-import { machine, XMsg, XCmd, XModel, enhance } from "../../utils/machine"
+import { machine, XMsg, XCmd, XModel, defineFlow } from "../../utils/machine"
 import { st } from "../../utils/misc"
 
 type InitialContext = {}
@@ -30,9 +30,9 @@ export type Msg = XMsg<typeof m>
 export type Cmd = XCmd<typeof m>
 export type Model = XModel<typeof m>
 
-export const LoadingState = enhance(
-    m, 
-    "LoadingState", 
+export const LoadingState = defineFlow(
+    m,
+    "LoadingState",
     () => [m.states.initial({})],
     {
         initial: {
@@ -52,4 +52,5 @@ export const LoadingState = enhance(
                 ),
             ],
         },
+        loaded: {}
     })

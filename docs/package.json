@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "devDependencies": {
     "@types/node": "^22.14.1",
-    "vitepress": "^1.6.3"
+    "vitepress": "^1.6.3",
+    "vitepress-plugin-llms": "^1.8.0"
   },
   "dependencies": {
     "tesm": "../"
@@ -15,5 +16,8 @@
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.52.5"
+  }
 }
