@@ -214,7 +214,7 @@ type FlowOptions<TState extends { state: string }, TMsg extends { type: string }
 	onInvalidState?: InvalidStateCallback<TState, TMsg>
 }
 
-export const enhanceMachine = <Machine extends _MachineBase>(
+export const defineFlow = <Machine extends _MachineBase>(
 	m: Machine,
 	name: string = "",
 	initial: () => readonly [XModel<Machine>, ...XCmd<Machine>[]],
