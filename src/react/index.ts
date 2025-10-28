@@ -1,4 +1,4 @@
-import { Dispatch, useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react"
+import { useCallback, useLayoutEffect, useMemo, useSyncExternalStore } from "react"
 import { createHandler } from "../tesm"
 import { createHook } from "../hook"
 
@@ -17,7 +17,7 @@ export function useTea<
 ): [Model, (msg: Msg) => void] {
 	const hook = useMemo(() => createHook(update)(init), [init, update])
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		return hook.addHandler(handleCmd)
 	}, [handleCmd])
 

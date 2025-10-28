@@ -56,7 +56,7 @@ export const createHook = <
         type EffectHandler = (cmd: Cmd) => void
         let handlers = new Set<EffectHandler>()
 
-        const runInitialEffects = () => {
+        const runInitialEffectsOnce = () => {
             if (initialCommandsProcessed) return
 
             initialCmds.forEach(cmd => handlers.forEach(h => h(cmd)))
@@ -66,7 +66,7 @@ export const createHook = <
         return {
             addHandler: (handler: EffectHandler) => {
                 handlers.add(handler)
-                runInitialEffects()
+                runInitialEffectsOnce()
                 return () => {
                     handlers.delete(handler)
                 }
