@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useMemo, useSyncExternalStore } from "react"
-import { createHandler } from "../tesm"
+import { CmdFuncs, CmdHandler, createHandler } from "../tesm"
 import { createHook } from "../hook"
 
 
@@ -43,12 +43,12 @@ export function useTeaSimple<
 		update: (msg: Msg, state: Model) => readonly [Model, ...Cmd[]]
 		msgCreator: (send: (msg: Msg) => void) => MsgCreator,
 	},
-	cmds: { [key in Cmd["type"]]: (cmd: Extract<Cmd, { type: key }>) => any }
+	cmds: CmdHandler<Cmd> | CmdFuncs<Cmd>
 ): readonly [
 	Model,
 	MsgCreator
 ] {
-	const handler = createHandler(cmds)
+	const handler = typeof cmds === "object" ? createHandler(cmds) : cmds
 	const [state, dispatch] = useTea(machine.initial, machine.update, handler)
 	const msgs = useMemo(() => machine.msgCreator(dispatch), [dispatch])
 	return useMemo(() => [state, msgs] as const, [state, msgs])

@@ -1,4 +1,4 @@
-export { type ExtractValues, keys, msg, cmd, msgErr, state } from "./tesm"
+export { type ExtractValues, keys, msg, cmd, msgErr, state, type CmdHandler, createHandler, type CmdFuncs } from "./tesm"
 
 export { splitApply, simpleFlow, invalidStateMsg } from "./extensions"
 

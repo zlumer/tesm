@@ -54,6 +54,37 @@ function App() {
 export default App
 ```
 
+## Separate Cmd Handler
+
+You can create command handlers separately from the hook using `createHandler()` function. 
+
+```ts
+import { createHandler } from "tesm"
+import { LoadingState, Cmd } from "./state"
+
+// Create handler separately
+const cmdHandler = createHandler<Cmd>({
+	displayPopup: ({ text }) => {
+		alert(text)
+	},
+	startLoadingAnimation: ({}) => {
+		// Start loading animation logic
+	},
+})
+
+function App() {
+	// Pass the pre-created handler to the hook
+	const [model, msgs] = useTeaSimple(LoadingState, cmdHandler)
+	
+	// ... rest of component
+}
+```
+
+This approach is useful when:
+- You want to keep your component code cleaner by extracting side-effect logic
+- You need to test command handlers separately
+- You need to compose state machines in a hierarchy, where one machine's command handler can receive another machine's command handler        
+
 ## Node.js
 
 For convenience we can use a **hook** (not to be confused with React Hooks): an object that maintains current state and updates it when new `Msg` arrive.  

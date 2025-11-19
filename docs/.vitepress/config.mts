@@ -7,7 +7,7 @@ export default defineConfig({
   title: "TESM",
   description: "The Elm State Machine",
   base: "/tesm/",
- 
+
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -33,6 +33,7 @@ export default defineConfig({
         text: "Other",
         items: [
           { text: 'Error Handling', link: '/docs/other/error-handling' },
+          { text: "LLM", link: "/docs/other/llm" }
         ]
       }],
 

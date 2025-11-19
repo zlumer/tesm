@@ -66,16 +66,20 @@ export const createMsgCreator = <MsgMap extends FuncMap<string>>(subMsgs: MsgMap
 		return o2 as { [key in Msg["type"]]: (...args: Parameters<MsgMap[key]>) => void }
 	})()
 
-export function createHandler<Cmd extends { type: string }>(funcs: {
-	[key in Cmd["type"]]: (cmd: Extract<Cmd, { type: key }>) => void
-}) {
-	return (cmd: Cmd) => {
+export function createHandler<Cmd extends { type: string }>(funcs: CmdFuncs<Cmd>): CmdHandler<Cmd> {
+	return (cmd) => {
 		// console.log("handling", cmd)
 
 		const handler = funcs[cmd.type as Cmd["type"]]
 		return handler?.(cmd as any)
 	}
 }
+
+export type CmdFuncs<Cmd extends { type: string }> = {
+	[key in Cmd["type"]]: (cmd: Extract<Cmd, { type: key }>) => void
+}
+
+export type CmdHandler<Cmd extends { type: string }> = (cmd: Cmd) => void
 
 export function msgErr(f: (m: { error: unknown }) => void) {
 	return (error: unknown) => {
