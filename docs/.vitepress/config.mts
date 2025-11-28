@@ -3,7 +3,7 @@ import llmstxt from 'vitepress-plugin-llms'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  vite: { plugins: [llmstxt({ stripHTML: false })] },
+  vite: { plugins: [llmstxt()] },
   title: "TESM",
   description: "The Elm State Machine",
   base: "/tesm/",

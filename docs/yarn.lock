@@ -1427,7 +1427,7 @@ tabbable@^6.2.0:
   integrity sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==
 
 tesm@../:
-  version "2.0.3"
+  version "2.0.6"
   resolved "file:.."
 
 tokenx@^1.1.0:
@@ -1542,10 +1542,10 @@ vfile@^6.0.0:
   optionalDependencies:
     fsevents "~2.3.3"
 
-vitepress-plugin-llms@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/vitepress-plugin-llms/-/vitepress-plugin-llms-1.8.0.tgz"
-  integrity sha512-JQR2j+4OpB0GlmXSJCdTHYIx4AcOZ0LVLRwQVId1wvNRRRGTVs17S5YkBNV0oj8t0zTgJ+TE61f58CJC8CTe4w==
+vitepress-plugin-llms@^1.9.3:
+  version "1.9.3"
+  resolved "https://registry.npmjs.org/vitepress-plugin-llms/-/vitepress-plugin-llms-1.9.3.tgz"
+  integrity sha512-iU6LQVGS35urNGW/RXHTtt9gj6kprV9ptJDX7ZiC+kgFtqiBMDo2bdXh2YG+KUGU3geKZWkWZcurhnrNCmofsA==
   dependencies:
     gray-matter "^4.0.3"
     markdown-it "^14.1.0"
