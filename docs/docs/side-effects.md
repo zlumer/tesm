@@ -107,7 +107,7 @@ function App() {
 This approach is useful when:
 - You want to keep your component code cleaner by extracting side-effect logic
 - You need to test command handlers separately
-- You need to compose state machines in a hierarchy, where one machine's command handler can receive another machine's command handler        
+- You need to compose state machines in a hierarchy, where one machine's command handler can receive another machine's command handler
 
 ## Node.js
 
