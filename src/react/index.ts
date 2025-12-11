@@ -18,6 +18,7 @@ export function useTeaSimple<
 	Model,
 	MsgCreator
 ] {
+	// Either a function that returns a handler (e.g. createHandlerF) or a handler directly  
 	const handler = typeof cmds === "object" ? createHandler(cmds) : cmds
 
 	const hook = useMemo(() => createHook(machine.update)(machine.initial), [machine.initial, machine.update])
