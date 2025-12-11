@@ -69,7 +69,7 @@ const cmdHandler = createHandler<typeof LoadingState>({
 		alert(text)
 	},
 	startLoadingAnimation: (cmd, msgs) => {
-		// Start loading animation logic		
+		// Start loading animation logic
 	},
 })
 
