@@ -27,10 +27,10 @@ import { useTeaSimple } from "tesm/react"
 ```tsx
 function App() {
 	const [model, msgs] = useTeaSimple(LoadingState, {
-		displayPopup: ({ text }) => {
+		displayPopup: ({ text }, msgs) => {
 			alert(text)
 		},
-		startLoadingAnimation: ({}) => {},
+		startLoadingAnimation: (cmd, msgs) => {},
 	})
 
 	return (
@@ -53,6 +53,61 @@ function App() {
 
 export default App
 ```
+
+## Separate Cmd Handler
+
+You can create command handlers separately from the hook using `createHandler()` function. 
+>`createHandler()` requires machine's type (return type of `machine()` or `defineFlow()`)
+
+```ts
+import { createHandler } from "tesm"
+import { LoadingState } from "./state"
+
+// Create handler separately
+const cmdHandler = createHandler<typeof LoadingState>({
+	displayPopup: ({ text }, msgs) => {
+		alert(text)
+	},
+	startLoadingAnimation: (cmd, msgs) => {
+		// Start loading animation logic
+	},
+})
+
+function App() {
+	// Pass the pre-created handler to the hook
+	const [model, msgs] = useTeaSimple(LoadingState, cmdHandler)
+	
+	// ... rest of component
+}
+```
+Even more flexibility can be achieved with the `createHandlerF()` function. It accepts a function with parameters that can be passed through in the component.
+
+```ts
+import { createHandlerF } from "tesm"
+import { LoadingState } from "./state"
+
+// Create handler with external "alert"  
+const cmdHandlerF = createHandlerF<typeof LoadingState, { alert: (s: string) => void }>(({ alert }) => ({
+	displayPopup: ({ text }, msgs) => {
+		alert(text)
+	},
+	startLoadingAnimation: (cmd, msgs) => {
+
+	},
+}))
+
+function App() {
+	// Pass the pre-created handler to the hook
+	const [model, msgs] = useTeaSimple(LoadingState, cmdHandlerF({ alert: window.alert }))
+	
+	// ... rest of component
+}
+```
+
+This approach is useful when:
+- You want to keep your component code cleaner by extracting side-effect logic
+- You need to test command handlers separately
+- You need to compose state machines in a hierarchy, where one machine's command handler can receive another machine's command handler
 
 ## Node.js
 

@@ -3,11 +3,11 @@ import llmstxt from 'vitepress-plugin-llms'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  vite: { plugins: [llmstxt({ stripHTML: false })] },
+  vite: { plugins: [llmstxt()] },
   title: "TESM",
   description: "The Elm State Machine",
   base: "/tesm/",
- 
+
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -33,6 +33,7 @@ export default defineConfig({
         text: "Other",
         items: [
           { text: 'Error Handling', link: '/docs/other/error-handling' },
+          { text: "LLM", link: "/docs/other/llm" }
         ]
       }],
 

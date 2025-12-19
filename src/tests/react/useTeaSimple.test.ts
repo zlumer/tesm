@@ -56,7 +56,8 @@ describe("StrictMode", () => {
         expect(mockHandlers.displayPopup).toHaveBeenCalledWith(
             expect.objectContaining({
                 text: `Loading finished in 1000 milliseconds!`
-            })
+            }),
+            expect.any(Object)
         )
     })
 
@@ -68,7 +69,7 @@ describe("StrictMode", () => {
         const secondHandlers = {
             log: vi.fn(),
         }
-        
+
         const { result, rerender } = renderHook(
             ({ handlers }) => useTeaSimple(CounterState, handlers),
             {
@@ -93,6 +94,49 @@ describe("StrictMode", () => {
         expect(result.current[0]).toEqual({ state: 'active', value: 2 })
         expect(secondHandlers.log).toHaveBeenCalledTimes(1)
         expect(firstHandlers.log).toHaveBeenCalledTimes(1)
+    })
+
+    it("msgs from effect handlers work correctly", async () => {
+        const mockHandlers = {
+            startLoadingAnimation: vi.fn(),
+            displayPopup: vi.fn()
+        }
+
+
+        mockHandlers.startLoadingAnimation.mockImplementation((cmd, msgs) => {
+            setTimeout(() => {
+                msgs.finished_loading(2000)
+            }, 0);
+        })
+
+        const { result } = renderHook(() =>
+            useTeaSimple(LoadingState, mockHandlers), { wrapper: StrictMode }
+        )
+
+        expect(result.current[0]).toEqual({ state: 'initial' })
+        expect(result.current[1]).toBeDefined()
+
+        act(() => {
+            result.current[1].started_loading(1000)
+        })
+
+        expect(result.current[0]).toEqual({ state: 'loading', loadingStarted: 1000 })
+        expect(mockHandlers.startLoadingAnimation).toHaveBeenCalledTimes(1);
+
+        await act(async () => {
+            await new Promise(resolve => setTimeout(resolve, 0))
+        })
+        expect(result.current[0]).toEqual({
+            state: 'loaded',
+            loadingStarted: 1000,
+            loadingFinished: 2000
+        })
+        expect(mockHandlers.displayPopup).toHaveBeenCalledWith(
+            expect.objectContaining({
+                text: `Loading finished in 1000 milliseconds!`
+            }),
+            expect.any(Object)
+        )
     })
 })
 

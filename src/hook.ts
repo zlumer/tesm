@@ -1,3 +1,5 @@
+import { CmdHandler } from "./tesm"
+
 const createHookRaw = <
     Model extends { state: string },
     Msg extends { type: string },
@@ -39,7 +41,8 @@ const createHookRaw = <
 export const createHook = <
     Model extends { state: string },
     Msg extends { type: string },
-    Cmd extends { type: string }
+    Cmd extends { type: string },
+    MsgCreator
 >(
     update: (msg: Msg, model: Model) => readonly [Model, ...Cmd[]]
 ) =>
@@ -50,11 +53,9 @@ export const createHook = <
 
         let initialCommandsProcessed = false
 
-
         let listeners = new Set<() => void>()
 
-        type EffectHandler = (cmd: Cmd) => void
-        let handlers = new Set<EffectHandler>()
+        let handlers = new Set<ReturnType<CmdHandler<Cmd, MsgCreator>>>()
 
         const runInitialEffectsOnce = () => {
             if (initialCommandsProcessed) return
@@ -64,7 +65,7 @@ export const createHook = <
         }
 
         return {
-            addHandler: (handler: EffectHandler) => {
+            addHandler: (handler: ReturnType<CmdHandler<Cmd, MsgCreator>>) => {
                 handlers.add(handler)
                 runInitialEffectsOnce()
                 return () => {

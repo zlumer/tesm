@@ -9,7 +9,7 @@ const GlobalStateContext = createContext<
 
 export const GlobalStateProvider: React.FC<PropsWithChildren> = (props) => {
 	const [state, msgs] = useTeaSimple(AppLoading.machine, {
-		initialize: async () => {
+		initialize: async (cmd, msgs) => {
 			await sleep(1000)
 			return msgs.initialized({
 				configUrl: "https://example.com/config.json",
@@ -17,11 +17,11 @@ export const GlobalStateProvider: React.FC<PropsWithChildren> = (props) => {
 				username: "user",
 			})
 		},
-		loadConfig: async (configUrl) => {
+		loadConfig: async (cmd, msgs) => {
 			await sleep(1000)
 			return msgs.config_loaded({}, Date.now())
 		},
-		loadLocalStorage: async () => {
+		loadLocalStorage: async (cmd, msgs) => {
 			await sleep(1000)
 			return msgs.local_storage_loaded({})
 		},

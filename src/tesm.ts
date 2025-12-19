@@ -1,3 +1,5 @@
+import { _MachineBase, XCmd } from "./utils/machine"
+
 type FunctionMap<T extends any> = T extends { [key: string]: (...args: any[]) => any } ? T : any
 
 export type ExtractValues<T extends any> = ReturnType<FunctionMap<T>[keyof T]>
@@ -66,16 +68,35 @@ export const createMsgCreator = <MsgMap extends FuncMap<string>>(subMsgs: MsgMap
 		return o2 as { [key in Msg["type"]]: (...args: Parameters<MsgMap[key]>) => void }
 	})()
 
-export function createHandler<Cmd extends { type: string }>(funcs: {
-	[key in Cmd["type"]]: (cmd: Extract<Cmd, { type: key }>) => void
-}) {
-	return (cmd: Cmd) => {
-		// console.log("handling", cmd)
 
+export type CmdFuncs<Cmd extends { type: string }, MsgCreator> = {
+	[key in Cmd["type"]]: (cmd: Extract<Cmd, { type: key }>, msgs: MsgCreator) => void
+}
+export type CmdHandler<Cmd extends { type: string }, MsgCreator> = (msgs: MsgCreator) => (cmd: Cmd) => void
+
+export function createHandler<
+	Machine extends _MachineBase, 
+	Cmd extends XCmd<Machine> = XCmd<Machine>, 
+	MsgCreator = ReturnType<Machine['msgCreator']>
+>(funcs: CmdFuncs<Cmd, MsgCreator>): CmdHandler<Cmd, MsgCreator> {
+	return (msgs) => (cmd) => {
 		const handler = funcs[cmd.type as Cmd["type"]]
-		return handler?.(cmd as any)
+		return handler?.(cmd as any, msgs)
 	}
 }
+
+export type CmdHandlerFactory<Cmd extends { type: string }, Params extends object, MsgCreator> = (params: Params) => CmdHandler<Cmd, MsgCreator>
+
+export function createHandlerF<
+	Machine extends _MachineBase,
+	Params extends object = {},
+	Cmd extends XCmd<Machine> = XCmd<Machine>,
+	MsgCreator = ReturnType<Machine['msgCreator']>
+>(f: (params: Params) => CmdFuncs<Cmd, MsgCreator>): CmdHandlerFactory<Cmd, Params, MsgCreator> {
+	return (params: Params) => createHandler(f(params))
+}
+
+
 
 export function msgErr(f: (m: { error: unknown }) => void) {
 	return (error: unknown) => {
