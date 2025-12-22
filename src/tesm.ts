@@ -75,10 +75,19 @@ export type CmdFuncs<Cmd extends { type: string }, MsgCreator> = {
 export type CmdHandler<Cmd extends { type: string }, MsgCreator> = (msgs: MsgCreator) => (cmd: Cmd) => void
 
 export function createHandler<
-	Machine extends _MachineBase, 
-	Cmd extends XCmd<Machine> = XCmd<Machine>, 
-	MsgCreator = ReturnType<Machine['msgCreator']>
->(funcs: CmdFuncs<Cmd, MsgCreator>): CmdHandler<Cmd, MsgCreator> {
+	Model extends { state: string },
+	Msg extends { type: string },
+	Cmd extends { type: string },
+	MsgCreator
+>(
+	// machine is used for type inference only
+	machine: {
+		initial: () => readonly [Model, ...Cmd[]]
+		update: (msg: Msg, state: Model) => readonly [Model, ...Cmd[]]
+		msgCreator: (send: (msg: Msg) => void) => MsgCreator,
+	},
+	funcs: CmdFuncs<Cmd, MsgCreator>
+): CmdHandler<Cmd, MsgCreator> {
 	return (msgs) => (cmd) => {
 		const handler = funcs[cmd.type as Cmd["type"]]
 		return handler?.(cmd as any, msgs)
@@ -88,15 +97,18 @@ export function createHandler<
 export type CmdHandlerFactory<Cmd extends { type: string }, Params extends object, MsgCreator> = (params: Params) => CmdHandler<Cmd, MsgCreator>
 
 export function createHandlerF<
-	Machine extends _MachineBase,
-	Params extends object = {},
-	Cmd extends XCmd<Machine> = XCmd<Machine>,
-	MsgCreator = ReturnType<Machine['msgCreator']>
->(f: (params: Params) => CmdFuncs<Cmd, MsgCreator>): CmdHandlerFactory<Cmd, Params, MsgCreator> {
-	return (params: Params) => createHandler(f(params))
+	Params extends object,
+	Model extends { state: string },
+	Msg extends { type: string },
+	Cmd extends { type: string },
+	MsgCreator
+>(machine: {
+	initial: () => readonly [Model, ...Cmd[]]
+	update: (msg: Msg, state: Model) => readonly [Model, ...Cmd[]]
+	msgCreator: (send: (msg: Msg) => void) => MsgCreator,
+}, f: (params: Params) => CmdFuncs<Cmd, MsgCreator>): CmdHandlerFactory<Cmd, Params, MsgCreator> {
+	return (params: Params) => createHandler(machine, f(params))
 }
-
-
 
 export function msgErr(f: (m: { error: unknown }) => void) {
 	return (error: unknown) => {

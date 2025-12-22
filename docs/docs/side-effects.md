@@ -56,15 +56,14 @@ export default App
 
 ## Separate Cmd Handler
 
-You can create command handlers separately from the hook using `createHandler()` function. 
->`createHandler()` requires machine's type (return type of `machine()` or `defineFlow()`)
+You can create command handlers separately from the hook using `createHandler()` function.
 
 ```ts
 import { createHandler } from "tesm"
 import { LoadingState } from "./state"
 
 // Create handler separately
-const cmdHandler = createHandler<typeof LoadingState>({
+const cmdHandler = createHandler(LoadingState, {
 	displayPopup: ({ text }, msgs) => {
 		alert(text)
 	},
@@ -87,9 +86,11 @@ import { createHandlerF } from "tesm"
 import { LoadingState } from "./state"
 
 // Create handler with external "alert"  
-const cmdHandlerF = createHandlerF<typeof LoadingState, { alert: (s: string) => void }>(({ alert }) => ({
+type HandlerParams = { alert: (s: string) => void }
+
+const cmdHandlerF = createHandlerF(LoadingState, (params: HandlerParams) => ({
 	displayPopup: ({ text }, msgs) => {
-		alert(text)
+		params.alert(text)
 	},
 	startLoadingAnimation: (cmd, msgs) => {
 
