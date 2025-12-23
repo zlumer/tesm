@@ -1,6 +1,6 @@
 {
   "name": "tesm",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "The Elm State Machine",
   "repository": "git@github.com:zlumer/tesm.git",
   "author": "zlumer <zlumer@gmail.com>",
