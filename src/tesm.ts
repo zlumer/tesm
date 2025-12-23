@@ -75,17 +75,12 @@ export type CmdFuncs<Cmd extends { type: string }, MsgCreator> = {
 export type CmdHandler<Cmd extends { type: string }, MsgCreator> = (msgs: MsgCreator) => (cmd: Cmd) => void
 
 export function createHandler<
-	Model extends { state: string },
-	Msg extends { type: string },
-	Cmd extends { type: string },
-	MsgCreator
+	Machine extends _MachineBase,
+	Cmd extends XCmd<Machine> = XCmd<Machine>,
+	MsgCreator = ReturnType<Machine['msgCreator']>
 >(
-	// machine is used for type inference only
-	machine: {
-		initial: () => readonly [Model, ...Cmd[]]
-		update: (msg: Msg, state: Model) => readonly [Model, ...Cmd[]]
-		msgCreator: (send: (msg: Msg) => void) => MsgCreator,
-	},
+	// machine is only used for type inference
+	machine: Machine,
 	funcs: CmdFuncs<Cmd, MsgCreator>
 ): CmdHandler<Cmd, MsgCreator> {
 	return (msgs) => (cmd) => {
@@ -98,15 +93,10 @@ export type CmdHandlerFactory<Cmd extends { type: string }, Params extends objec
 
 export function createHandlerF<
 	Params extends object,
-	Model extends { state: string },
-	Msg extends { type: string },
-	Cmd extends { type: string },
-	MsgCreator
->(machine: {
-	initial: () => readonly [Model, ...Cmd[]]
-	update: (msg: Msg, state: Model) => readonly [Model, ...Cmd[]]
-	msgCreator: (send: (msg: Msg) => void) => MsgCreator,
-}, f: (params: Params) => CmdFuncs<Cmd, MsgCreator>): CmdHandlerFactory<Cmd, Params, MsgCreator> {
+	Machine extends _MachineBase,
+	Cmd extends XCmd<Machine> = XCmd<Machine>,
+	MsgCreator = ReturnType<Machine['msgCreator']>
+>(machine: Machine, f: (params: Params) => CmdFuncs<Cmd, MsgCreator>): CmdHandlerFactory<Cmd, Params, MsgCreator> {
 	return (params: Params) => createHandler(machine, f(params))
 }
 

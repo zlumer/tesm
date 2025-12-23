@@ -4,6 +4,7 @@ import { useTeaSimple } from '../../react'
 import { renderHook, act } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { CounterState } from '../machines/counter'
+import { createHandlerF } from '../../tesm'
 
 describe("StrictMode", () => {
     it("commands are not duplicated", () => {
@@ -137,6 +138,29 @@ describe("StrictMode", () => {
             }),
             expect.any(Object)
         )
+    })
+
+    it("test createHandlerF", () => {
+        const mockLogger = vi.fn();
+
+        const handler = createHandlerF(LoadingState, (params: { logger: (s: string) => void }) => ({
+            displayPopup: () => {
+                params.logger("Displaying popup");
+            },
+            startLoadingAnimation: () => {
+                params.logger("Starting loading animation");
+            }
+        }))
+
+        const { result } = renderHook(() =>
+            useTeaSimple(LoadingState, handler({ logger: mockLogger })), { wrapper: StrictMode }
+        )
+
+        act(() => {
+            result.current[1].started_loading(1000)
+        })
+
+        expect(mockLogger).toHaveBeenCalledWith("Starting loading animation");
     })
 })
 
