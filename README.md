@@ -1,8 +1,8 @@
 # The Elm State Machine
 
-The Elm State Machine is a state management library based on [The Elm Architecture](https://guide.elm-lang.org/architecture/).
+State management library based on [The Elm Architecture](https://guide.elm-lang.org/architecture/).
 
-This library makes use of concepts familiar to Elm programmers (such as Model, Msg, Cmd) to manage application state in a totally **pure** way.
+Concepts familiar to Elm programmers (Model, Msg, Cmd) in a totally **pure** way.
 
 TESM is written in TypeScript. While vanilla JavaScript is supported, it is highly recommended to use TypeScript for the benefit of strict type checking.
 
